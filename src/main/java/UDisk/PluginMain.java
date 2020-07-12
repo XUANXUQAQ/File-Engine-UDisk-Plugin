@@ -639,6 +639,11 @@ public class PluginMain extends Plugin {
         return _pollFromResultQueue();
     }
 
+    //Do Not Remove
+    public int getApiVersion() {
+        return _getApiVersion();
+    }
+
     @Override
     public void textChanged(String _text) {
         if (!_text.isEmpty()) {
@@ -660,6 +665,7 @@ public class PluginMain extends Plugin {
                 keywords = semicolon.split(searchText);
                 isIndexMode = false;
             }
+            commandQueue.clear();
             timer = true;
             startTime = System.currentTimeMillis();
         }

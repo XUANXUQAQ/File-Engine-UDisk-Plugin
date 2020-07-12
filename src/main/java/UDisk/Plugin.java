@@ -9,6 +9,7 @@ public abstract class Plugin {
 
     private final ConcurrentLinkedQueue<String> resultQueue = new ConcurrentLinkedQueue<>();
     private final ConcurrentLinkedQueue<String[]> messageQueue = new ConcurrentLinkedQueue<>();
+    private static final int API_VERSION = 1;
 
     public void addToResultQueue(String result) {
         resultQueue.add(result);
@@ -19,6 +20,9 @@ public abstract class Plugin {
         messageQueue.add(messages);
     }
 
+    protected int _getApiVersion() {
+        return API_VERSION;
+    }
     protected String _pollFromResultQueue() {
         return resultQueue.poll();
     }
