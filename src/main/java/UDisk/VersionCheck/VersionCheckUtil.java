@@ -1,0 +1,53 @@
+package UDisk.VersionCheck;
+
+import com.alibaba.fastjson.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
+
+public class VersionCheckUtil {
+    private static String currentVersion = "1.0";
+    private static String updateURL;
+
+    private static JSONObject getVersionInfo() throws IOException {
+        StringBuilder jsonUpdate = new StringBuilder();
+        URL updateServer = new URL("https://gitee.com/xuanxuF/File-Engine/raw/master/UDiskPluginVVersion.json");
+        URLConnection uc = updateServer.openConnection();
+        uc.setConnectTimeout(3 * 1000);
+        //防止屏蔽程序抓取而返回403错误
+        uc.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.116 Safari/537.36 Edg/80.0.361.57");
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(uc.getInputStream(), StandardCharsets.UTF_8))) {
+            String eachLine;
+            while ((eachLine = br.readLine()) != null) {
+                jsonUpdate.append(eachLine);
+            }
+        }
+        return JSONObject.parseObject(jsonUpdate.toString());
+    }
+
+    public static String _getUpdateURL() {
+        return updateURL;
+    }
+
+    public static boolean _isLatest() {
+        try {
+            JSONObject json = getVersionInfo();
+            String latestVersion = json.getString("version");
+            if (Double.parseDouble(latestVersion) > Double.parseDouble(currentVersion)) {
+                updateURL = json.getString("url");
+                return false;
+            }
+        } catch (IOException e) {
+            return true;
+        }
+        return true;
+    }
+
+    public static String _getPluginVersion() {
+        return currentVersion;
+    }
+}

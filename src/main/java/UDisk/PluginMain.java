@@ -3,6 +3,7 @@ package UDisk;
 import UDisk.DllInterface.GetAscII;
 import UDisk.SqliteConfig.SQLiteUtil;
 import UDisk.GetIcon.GetIconUtil;
+import UDisk.VersionCheck.VersionCheckUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
@@ -48,10 +49,10 @@ public class PluginMain extends Plugin {
     private volatile boolean isCopyPathPressed = false;
     private volatile boolean isIndexMode = false;
     private volatile boolean isOpenLastFolderPressed = false;
-    private int iconSideLength = 0;
+    private int pluginIconSideLength = 0;
     private final Border border = BorderFactory.createLineBorder(new Color(73, 162, 255, 255));
-    private Color labelColor;
-    private Color backgroundColor;
+    private Color pluginLabelColor;
+    private Color pluginBackgroundColor;
     private volatile String text;
     private volatile int openLastFolderKeyCode;
     private volatile int runAsAdminKeyCode;
@@ -110,8 +111,8 @@ public class PluginMain extends Plugin {
 
     private void saveSettings() {
         JSONObject json = new JSONObject();
-        json.put("labelColor", labelColor.getRGB());
-        json.put("backgroundColor", backgroundColor.getRGB());
+        json.put("labelColor", pluginLabelColor.getRGB());
+        json.put("backgroundColor", pluginBackgroundColor.getRGB());
         json.put("openLastFolderKeyCode", openLastFolderKeyCode);
         json.put("runAsAdminKeyCode", runAsAdminKeyCode);
         json.put("copyPathKeyCode", copyPathKeyCode);
@@ -134,14 +135,14 @@ public class PluginMain extends Plugin {
             }
             JSONObject settingsInJson = JSON.parseObject(strb.toString());
             if (settingsInJson.containsKey("labelColor")) {
-                labelColor = new Color(settingsInJson.getInteger("labelColor"));
+                pluginLabelColor = new Color(settingsInJson.getInteger("labelColor"));
             } else {
-                labelColor = new Color(0xFF9868);
+                pluginLabelColor = new Color(0xFF9868);
             }
             if (settingsInJson.containsKey("backgroundColor")) {
-                backgroundColor = new Color(settingsInJson.getInteger("backgroundColor"));
+                pluginBackgroundColor = new Color(settingsInJson.getInteger("backgroundColor"));
             } else {
-                backgroundColor = new Color(0xffffff);
+                pluginBackgroundColor = new Color(0xffffff);
             }
             if (settingsInJson.containsKey("openLastFolderKeyCode")) {
                 openLastFolderKeyCode = settingsInJson.getInteger("openLastFolderKeyCode");
@@ -159,8 +160,8 @@ public class PluginMain extends Plugin {
                 copyPathKeyCode = 18;
             }
         } catch (NullPointerException | IOException e) {
-            labelColor = new Color(0xFF9868);
-            backgroundColor = new Color(0xffffff);
+            pluginLabelColor = new Color(0xFF9868);
+            pluginBackgroundColor = new Color(0xffffff);
             openLastFolderKeyCode = 17;
             runAsAdminKeyCode = 16;
             copyPathKeyCode = 18;
@@ -802,90 +803,80 @@ public class PluginMain extends Plugin {
 
     @Override
     public String getOfficialSite() {
-        return null;
+        return "https://github.com/XUANXUQAQ/File-Engine-UDisk-Plugin";
     }
 
 
     @Override
     public String getVersion() {
-        return "1.0";
+        return VersionCheckUtil._getPluginVersion();
     }
 
     @Override
     public String getDescription() {
-        return "中文说明:\n" +
+        return "中文说明：\n" +
                 "\n" +
-                "一个插件使File-Engine支持索引U盘.\n" +
-                "使用说明：\n" +
-                "        1.在搜索框中输入     “>udisk >index:（盘符）”    以索引对应盘中的所有文件.\n" +
+                "1.将U盘插入计算机时，\n" +
+                "\t您会看到这样的提示\n" +
+                "\t---->键入“> udisk>驱动器号”来索引U盘\n" +
+                "\t只需输入提示提示，您将收到另一个提示\n" +
+                "\t---->搜索完成。\n" +
                 "\n" +
-                "示例：索引G盘中的所有文件。 \n" +
-                "--------> \">udisk >index:G\"\n" +
+                "2.搜索完成后。您可以输入“> udisk test”来搜索名称包含“ test”的文件。\n" +
+                "\t示例1：“>“ udisk测试” --->包含“ test”（“ TEST”“ Test”“ TEst” ...）的文件或目录。\n" +
+                "\t示例2：“> udisk test1; test2” --->包含“ test1（TEST1）”和“ test2（TEST2）”的文件或目录\n" +
+                "\t您也可以使用一些过滤器，例如“：f（file）”“：d（directory）”“：full”“：case”。不同的过滤器应以分号分隔。\n" +
+                "\t示例1：“> udisk test：f” ---->仅包含“ test”（“ TEST”“ Test”“ TEst” ...）的文件。\n" +
+                "\t示例2：“> udisk test：d” ---->仅包含“ test”（“ TEST”“ Test”“ TEst” ...）的目录。\n" +
+                "\t示例3：“> udisk test：full” --->名称为“ test”（“ TEST”“ Test”“ TEst” ...）的文件或目录。\n" +
+                "\t示例4：“> udisk test：case” --->包含“ test”的文件或目录。\n" +
+                "\t示例5：“> udisk test：f; full” --->仅名称为“ test”（“ TEST”“ Test”“ TEst” ...）的文件。\n" +
+                "\t示例6：“> udisk test：d; case; full” --->仅名称为“ test”的目录。\n" +
                 "\n" +
-                "        2.之后，在搜索框中输入 \">udisk (关键字)\"来搜索含有该关键字的文件。\n" +
+                "English Instuction:\n" +
                 "\n" +
-                "示例：搜索含有test的所有文件. \n" +
-                "-------->\">udisk test\"\n" +
+                "1. When you plug the U disk into the computer,\n" +
+                "\tYou will see a tip like this\n" +
+                "\t----> Type \">udisk> drive letter\" to index the U disk\n" +
+                "\tJust input what the tip says, and you will receive another tip like this\n" +
+                "\t----> Search Done.\n" +
                 "\n" +
-                "        3.规则匹配\n" +
-                "与File-Engine使用相同的规则，在关键字后添加 \":d\"(\":f\")来只搜索文件夹（文件）,添加 \":full\"全字匹配，添加\":case\"匹配大小写.\n" +
-                "不同的规则用分号隔开。\n" +
-                "\n" +
-                "示例：\n" +
-                "搜索含有test，全字匹配，并只输出文件。\n" +
-                "-------->\">udisk test:full;f\"\n" +
-                "搜索含有test，只输出文件夹\n" +
-                "-------->\">udisk test:d\"\n" +
-                "\n" +
-                "English Instruction:\n" +
-                "\n" +
-                "A plugin enables File-Engine to support indexing U disks.\n" +
-                "Instructions for use:\n" +
-                "         1. Type \">udisk >index: (drive letter)\" in the search box to index all files in the corresponding disk.\n" +
-                "\n" +
-                "Example: Index all files in the G drive.\n" +
-                "--------> \">udisk >index:G\"\n" +
-                "\n" +
-                "         2. After that, enter \">udisk (keyword)\" in the search box to search for the file containing the keyword.\n" +
-                "\n" +
-                "Example: Search all files containing test.\n" +
-                "-------->\">udisk test\"\n" +
-                "\n" +
-                "         3. Rule matching\n" +
-                "Use the same rules as File-Engine, add \":d\" (\":f\") after the keyword to search only the folder (file), add \":full\" to match the whole word, add \":case\" to match the case .\n" +
-                "Different rules are separated by semicolons.\n" +
-                "\n" +
-                "Examples:\n" +
-                "The search contains test, matches all words, and only outputs files.\n" +
-                "-------->\">udisk test:full;f\"\n" +
-                "Search contains test, only output folder\n" +
-                "-------->\">udisk test:d\"";
+                "2. When the search has done. You can input \">udisk test\" to search files whose name includeing \"test\".\n" +
+                "\tExample 1 : \">udisk test\" ---> files or dirs that including \"test\"(\"TEST\" \"Test\" \"TEst\"...).\n" +
+                "\tExample 2 : \">udisk test1;test2\" ---> files or dirs that including \"test1(TEST1)\" AND \"test2(TEST2)\"\n" +
+                "\tYou can also use some filters like \":f(file)\" \":d(directory)\" \":full\" \":case\".Different filters should be separated by semicolons.\n" +
+                "\tExample 1 : \">udisk test:f\" ----> Only files that including \"test\"(\"TEST\" \"Test\" \"TEst\"...).\n" +
+                "\tExample 2 : \">udisk test:d\" ----> Only directories that including \"test\"(\"TEST\" \"Test\" \"TEst\"...).\n" +
+                "\tExample 3 : \">udisk test:full\" ---> files or dirs whose name is \"test\"(\"TEST\" \"Test\" \"TEst\"...).\n" +
+                "\tExample 4 : \">udisk test:case\" ---> files or dirs that including \"test\".\n" +
+                "\tExample 5 : \">udisk test:f;full\" ---> Only files whose name is \"test\"(\"TEST\" \"Test\" \"TEst\"...).\n" +
+                "\tExample 6 : \">udisk test:d;case;full\" ---> Only dirs whose name is \"test\".";
     }
 
     @Override
     public boolean isLatest() {
-        return true;
+        return VersionCheckUtil._isLatest();
     }
 
     @Override
     public String getUpdateURL() {
-        return null;
+        return VersionCheckUtil._getUpdateURL();
     }
 
     @Override
     public void showResultOnLabel(String result, JLabel label, boolean isChosen) {
-        if (iconSideLength == 0) {
-            iconSideLength = label.getHeight() / 3;
+        if (pluginIconSideLength == 0) {
+            pluginIconSideLength = label.getHeight() / 3;
         }
         String name = getFileName(result);
-        ImageIcon icon = GetIconUtil.getBigIcon(result, iconSideLength, iconSideLength);
+        ImageIcon icon = GetIconUtil.getBigIcon(result, pluginIconSideLength, pluginIconSideLength);
         label.setIcon(icon);
         label.setBorder(border);
         label.setText("<html><body>" + name + "<br><font size=\"-1\">" + ">>" + getParentPath(result) + "</body></html>");
         if (isChosen) {
-            label.setBackground(labelColor);
+            label.setBackground(pluginLabelColor);
         } else {
-            label.setBackground(backgroundColor);
+            label.setBackground(pluginBackgroundColor);
         }
     }
 }
