@@ -9,7 +9,7 @@ public abstract class Plugin {
 
     private final ConcurrentLinkedQueue<String> resultQueue = new ConcurrentLinkedQueue<>();
     private final ConcurrentLinkedQueue<String[]> messageQueue = new ConcurrentLinkedQueue<>();
-    private static final int API_VERSION = 1;
+    private static final int API_VERSION = 2;
 
     public void addToResultQueue(String result) {
         resultQueue.add(result);
@@ -61,4 +61,6 @@ public abstract class Plugin {
     public abstract String getUpdateURL();
 
     public abstract void showResultOnLabel(String result, JLabel label, boolean isChosen);
+
+    public abstract String getAuthor();
 }

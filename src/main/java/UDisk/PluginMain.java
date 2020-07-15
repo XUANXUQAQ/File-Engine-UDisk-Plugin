@@ -879,4 +879,9 @@ public class PluginMain extends Plugin {
             label.setBackground(pluginBackgroundColor);
         }
     }
+
+    @Override
+    public String getAuthor() {
+        return "XUANXU";
+    }
 }
