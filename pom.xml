@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.example</groupId>
-    <artifactId>UDiskPlugin</artifactId>
-    <version>1.0</version>
+    <artifactId>UDisk</artifactId>
+    <version>1.1</version>
     <build>
         <plugins>
             <plugin>
