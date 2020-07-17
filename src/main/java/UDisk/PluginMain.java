@@ -598,6 +598,8 @@ public class PluginMain extends Plugin {
                                 command = "list40";
                                 commandQueue.add(command);
                                 break;
+                            default:
+                                break;
                         }
                     } else if ((endTime - startTime > 500) && (timer) && isIndexMode) {
                         timer = false;
@@ -605,7 +607,7 @@ public class PluginMain extends Plugin {
                         try {
                             if (text != null) {
                                 String searchPath = text.charAt(1) + ":";
-                                if (!searchPath.equals(":")) {
+                                if (!":".equals(searchPath)) {
                                     try {
                                         searchFiles(searchPath, databaseRelativePath);
                                         displayMessage("Info", "Search Done");
@@ -819,7 +821,7 @@ public class PluginMain extends Plugin {
                 "1.将U盘插入计算机时，\n" +
                 "\t您会看到这样的提示\n" +
                 "\t---->键入“> udisk>驱动器号”来索引U盘\n" +
-                "\t只需输入提示提示，您将收到另一个提示\n" +
+                "\t只需按照提示输入，您将收到另一个提示\n" +
                 "\t---->搜索完成。\n" +
                 "\n" +
                 "2.搜索完成后。您可以输入“> udisk test”来搜索名称包含“ test”的文件。\n" +
