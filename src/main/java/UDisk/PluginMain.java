@@ -195,6 +195,8 @@ public class PluginMain extends Plugin {
                             if (!isMatched(name, false)) {
                                 return false;
                             }
+                        default:
+                            break;
                     }
                 }
                 //所有规则均已匹配
