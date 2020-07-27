@@ -611,8 +611,10 @@ public class PluginMain extends Plugin {
                                 String searchPath = text.charAt(1) + ":";
                                 if (!":".equals(searchPath)) {
                                     try {
-                                        searchFiles(searchPath, databaseRelativePath);
-                                        displayMessage("Info", "Search Done");
+                                        if (new File(searchPath + "\\").exists()) {
+                                            searchFiles(searchPath, databaseRelativePath);
+                                            displayMessage("Info", "Search Done");
+                                        }
                                     } catch (IOException | InterruptedException e) {
                                         if (!(e instanceof InterruptedException)) {
                                             e.printStackTrace();
@@ -621,7 +623,6 @@ public class PluginMain extends Plugin {
                                 }
                             }
                         } catch (StringIndexOutOfBoundsException ignored) {
-
                         }
                     }
                     Thread.sleep(50);
