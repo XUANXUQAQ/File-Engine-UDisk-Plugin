@@ -650,6 +650,11 @@ public class PluginMain extends Plugin {
         return _getApiVersion();
     }
 
+    //Do Not Remove
+    public void clearResultQueue() {
+        _clearResultQueue();
+    }
+
     @Override
     public void textChanged(String _text) {
         if (!_text.isEmpty()) {
