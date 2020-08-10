@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import static UDisk.OpenFile.OpenFileUtil.openWithAdmin;
@@ -32,7 +33,6 @@ import static UDisk.OpenFile.OpenFileUtil.openWithoutAdmin;
 import static UDisk.Search.SearchUDisk.searchFiles;
 
 public class PluginMain extends Plugin {
-    private final String configurationPath = "plugins/Plugin configuration files/UDisk";
     private final String databaseRelativePath = "plugins/Plugin configuration files/UDisk/data.db";
     private final String settingsRelativePath = "plugins/Plugin configuration files/UDisk/settings.json";
     private final String[] arr = new String[] {"A","B","C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
@@ -285,7 +285,7 @@ public class PluginMain extends Plugin {
             }
 
             try {
-                Thread.sleep(50);
+                TimeUnit.MILLISECONDS.sleep(50);
             } catch (InterruptedException ignored) {
 
             }
@@ -312,7 +312,7 @@ public class PluginMain extends Plugin {
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }
-                    Thread.sleep(10);
+                    TimeUnit.MILLISECONDS.sleep(10);
                 }
             } catch (InterruptedException ignored) {
 
@@ -624,7 +624,7 @@ public class PluginMain extends Plugin {
                         } catch (StringIndexOutOfBoundsException ignored) {
                         }
                     }
-                    Thread.sleep(50);
+                    TimeUnit.MILLISECONDS.sleep(50);
                 }
             }catch (Exception e) {
                 if (!(e instanceof InterruptedException)) {
@@ -685,6 +685,7 @@ public class PluginMain extends Plugin {
     public void loadPlugin() {
         try {
             System.out.println("Loading plugin UDisk");
+            String configurationPath = "plugins/Plugin configuration files/UDisk";
             File pluginFolder = new File(configurationPath);
             if (!pluginFolder.exists()) {
                 pluginFolder.mkdirs();
