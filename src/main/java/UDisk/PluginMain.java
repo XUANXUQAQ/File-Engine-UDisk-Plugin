@@ -66,7 +66,6 @@ public class PluginMain extends Plugin {
             try {
                 sqlCache.get(each).close();
             } catch (SQLException ignored) {
-
             }
         }
     }
