@@ -110,8 +110,6 @@ public class PluginMain extends Plugin {
 
     private void saveSettings() {
         JSONObject json = new JSONObject();
-        json.put("labelColor", pluginLabelColor.getRGB());
-        json.put("backgroundColor", pluginBackgroundColor.getRGB());
         json.put("openLastFolderKeyCode", openLastFolderKeyCode);
         json.put("runAsAdminKeyCode", runAsAdminKeyCode);
         json.put("copyPathKeyCode", copyPathKeyCode);
@@ -133,16 +131,6 @@ public class PluginMain extends Plugin {
                 strb.append(line);
             }
             JSONObject settingsInJson = JSON.parseObject(strb.toString());
-            if (settingsInJson.containsKey("labelColor")) {
-                pluginLabelColor = new Color(settingsInJson.getInteger("labelColor"));
-            } else {
-                pluginLabelColor = new Color(0xFF9868);
-            }
-            if (settingsInJson.containsKey("backgroundColor")) {
-                pluginBackgroundColor = new Color(settingsInJson.getInteger("backgroundColor"));
-            } else {
-                pluginBackgroundColor = new Color(0xffffff);
-            }
             if (settingsInJson.containsKey("openLastFolderKeyCode")) {
                 openLastFolderKeyCode = settingsInJson.getInteger("openLastFolderKeyCode");
             } else {
@@ -652,6 +640,12 @@ public class PluginMain extends Plugin {
     //Do Not Remove
     public void clearResultQueue() {
         _clearResultQueue();
+    }
+
+    @Override
+    public void setCurrentTheme(int defaultColor, int choseLabelColor) {
+        pluginBackgroundColor = new Color(defaultColor);
+        pluginLabelColor = new Color(choseLabelColor);
     }
 
     @Override
