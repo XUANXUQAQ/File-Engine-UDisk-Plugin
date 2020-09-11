@@ -34,7 +34,6 @@ import static UDisk.Search.SearchUDisk.searchFiles;
 
 public class PluginMain extends Plugin {
     private final String databaseRelativePath = "plugins/Plugin configuration files/UDisk/data.db";
-    private final String settingsRelativePath = "plugins/Plugin configuration files/UDisk/settings.json";
     private final String[] arr = new String[] {"A","B","C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
     private boolean isNotExit = true;
     private long startTime;
@@ -108,23 +107,10 @@ public class PluginMain extends Plugin {
         return true;
     }
 
-    private void saveSettings() {
-        JSONObject json = new JSONObject();
-        json.put("openLastFolderKeyCode", openLastFolderKeyCode);
-        json.put("runAsAdminKeyCode", runAsAdminKeyCode);
-        json.put("copyPathKeyCode", copyPathKeyCode);
-        try (BufferedWriter buffW = new BufferedWriter(new OutputStreamWriter(
-                new FileOutputStream(settingsRelativePath), StandardCharsets.UTF_8))) {
-            String format = JSON.toJSONString(json, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue, SerializerFeature.WriteDateUseDateFormat);
-            buffW.write(format);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     private void initAllSettings() {
         String line;
         StringBuilder strb = new StringBuilder();
+        String settingsRelativePath = "user/settings.json";
         File settings = new File(settingsRelativePath);
         try (BufferedReader buffr = new BufferedReader(new InputStreamReader(new FileInputStream(settings), StandardCharsets.UTF_8))) {
             while ((line = buffr.readLine()) != null) {
@@ -147,8 +133,6 @@ public class PluginMain extends Plugin {
                 copyPathKeyCode = 18;
             }
         } catch (NullPointerException | IOException e) {
-            pluginLabelColor = new Color(0xFF9868);
-            pluginBackgroundColor = new Color(0xffffff);
             openLastFolderKeyCode = 17;
             runAsAdminKeyCode = 16;
             copyPathKeyCode = 18;
@@ -684,12 +668,8 @@ public class PluginMain extends Plugin {
             if (!pluginFolder.exists()) {
                 pluginFolder.mkdirs();
             }
-            File settings = new File(settingsRelativePath);
-            if (!settings.exists()) {
-                settings.createNewFile();
-            }
+
             initAllSettings();
-            saveSettings();
 
             File database = new File(databaseRelativePath);
             SQLiteUtil.initConnection("jdbc:sqlite:" + database.getAbsolutePath());
