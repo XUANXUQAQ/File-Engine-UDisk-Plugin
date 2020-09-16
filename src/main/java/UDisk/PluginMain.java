@@ -1,12 +1,11 @@
 package UDisk;
 
 import UDisk.DllInterface.GetAscII;
-import UDisk.SqliteConfig.SQLiteUtil;
 import UDisk.GetIcon.GetIconUtil;
+import UDisk.SqliteConfig.SQLiteUtil;
 import UDisk.VersionCheck.VersionCheckUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.serializer.SerializerFeature;
 
 import javax.swing.*;
 import javax.swing.border.Border;
