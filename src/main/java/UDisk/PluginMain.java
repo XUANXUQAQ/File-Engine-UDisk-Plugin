@@ -234,41 +234,42 @@ public class PluginMain extends Plugin {
         }
     }
 
-    private String checkUDisk() {
+    private String[] checkUDisk() {
         File file ;
-        String disk = null;
+        StringBuilder disk = new StringBuilder();
         for(;;) {
             for(String str : arr) {
                 file = new File(str + ":\\");
                 // 如果磁盘现在存在，并且以前不存在
                 // 则表示刚插上U盘，返回
                 if(file.exists() && !map.get(str)) {
-                    disk = str;
+                    disk.append(str).append(";");
                 }
 
                 if(file.exists() != map.get(str)) {
                     map.put(str, file.exists());
                 }
             }
-
-            if (disk != null) {
-                return disk;
+            String disks = disk.toString();
+            if (!disks.isEmpty()) {
+                return semicolon.split(disks);
             }
 
             try {
                 TimeUnit.MILLISECONDS.sleep(50);
             } catch (InterruptedException ignored) {
-
             }
         }
     }
 
     private void initThreadPool() {
         threadPool.execute(() -> {
-            String UDisk;
+            String[] disks;
             while (isNotExit) {
-                UDisk = checkUDisk();
-                displayMessage("Info", "Input " + "\"" + " >udisk >" + UDisk + "\"" + " to initialize index");
+                disks = checkUDisk();
+                for (String UDisk : disks) {
+                    displayMessage("Info", "Input " + "\"" + " >udisk >" + UDisk + "\"" + " to initialize index");
+                }
             }
         });
 
