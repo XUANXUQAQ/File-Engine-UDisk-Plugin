@@ -48,9 +48,9 @@ public class PluginMain extends Plugin {
     private volatile boolean isIndexMode = false;
     private volatile boolean isOpenLastFolderPressed = false;
     private int pluginIconSideLength = 0;
-    private final Border border = BorderFactory.createLineBorder(new Color(73, 162, 255, 255));
-    private Color pluginLabelColor;
-    private Color pluginBackgroundColor;
+    private Border border = BorderFactory.createLineBorder(new Color(73, 162, 255, 255));
+    private Color pluginLabelColor = new Color(0xcccccc);
+    private Color pluginBackgroundColor = new Color(0x333333);
     private volatile String text;
     private volatile int openLastFolderKeyCode;
     private volatile int runAsAdminKeyCode;
@@ -627,9 +627,10 @@ public class PluginMain extends Plugin {
     }
 
     @Override
-    public void setCurrentTheme(int defaultColor, int choseLabelColor) {
+    public void setCurrentTheme(int defaultColor, int choseLabelColor, int borderColor) {
         pluginBackgroundColor = new Color(defaultColor);
         pluginLabelColor = new Color(choseLabelColor);
+        border = BorderFactory.createLineBorder(new Color(borderColor));
     }
 
     @Override
