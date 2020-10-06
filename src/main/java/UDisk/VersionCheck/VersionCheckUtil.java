@@ -15,7 +15,7 @@ public class VersionCheckUtil {
 
     private static JSONObject getVersionInfo() throws IOException {
         StringBuilder jsonUpdate = new StringBuilder();
-        URL updateServer = new URL("https://raw.githubusercontent.com/XUANXUQAQ/File-Engine-Version/master/Plugins%20Repository/UDiskPluginVersion.json");
+        URL updateServer = new URL("https://cdn.jsdelivr.net/gh/XUANXUQAQ/File-Engine-Version/Plugins%20Repository/UDiskPluginVersion.json");
         URLConnection uc = updateServer.openConnection();
         uc.setConnectTimeout(3000);
         //防止屏蔽程序抓取而返回403错误
