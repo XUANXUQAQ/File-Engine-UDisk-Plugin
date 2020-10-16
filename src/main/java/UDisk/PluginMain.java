@@ -268,7 +268,7 @@ public class PluginMain extends Plugin {
             while (isNotExit) {
                 disks = checkUDisk();
                 for (String UDisk : disks) {
-                    displayMessage("Info", "Input " + "\"" + " >udisk >" + UDisk + "\"" + " to initialize index");
+                    displayMessage("提示", "输入 " + "\"" + " >udisk >" + UDisk + "\"" + " 来创建索引");
                 }
             }
         });
@@ -584,7 +584,7 @@ public class PluginMain extends Plugin {
                                     try {
                                         if (new File(searchPath + "\\").exists()) {
                                             searchFiles(searchPath, databaseRelativePath);
-                                            displayMessage("Info", "Search Done");
+                                            displayMessage("提示", "搜索完成");
                                         }
                                     } catch (IOException | InterruptedException e) {
                                         if (!(e instanceof InterruptedException)) {
