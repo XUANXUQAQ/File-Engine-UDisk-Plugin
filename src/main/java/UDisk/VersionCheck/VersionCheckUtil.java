@@ -10,7 +10,7 @@ import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 
 public class VersionCheckUtil {
-    private static final String CURRENT_VERSION = "1.5";
+    private static final String CURRENT_VERSION = "1.6";
     private static String updateURL;
 
     private static JSONObject getVersionInfo() throws IOException {
