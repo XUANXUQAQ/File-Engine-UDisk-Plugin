@@ -56,17 +56,7 @@ public class PluginMain extends Plugin {
     private volatile int runAsAdminKeyCode;
     private volatile int copyPathKeyCode;
     private boolean timer = false;
-    private final HashMap<String, Boolean> map = new HashMap<>();
-    private final HashMap<String, PreparedStatement> sqlCache = new HashMap<>();
-
-    private void releaseAllSqlCache() {
-        for (String each : sqlCache.keySet()) {
-            try {
-                sqlCache.get(each).close();
-            } catch (SQLException ignored) {
-            }
-        }
-    }
+    private final HashMap<String, Boolean> mapDiskExist = new HashMap<>();
 
     private void initDll() {
         try {
@@ -191,25 +181,19 @@ public class PluginMain extends Plugin {
 
     private void addResult(long time, String column) throws SQLException {
         //为label添加结果
-        ResultSet resultSet;
         String each;
         String pSql = "SELECT PATH FROM " + column + ";";
-        PreparedStatement pStmt;
-        if ((pStmt = sqlCache.get(pSql)) == null) {
-            pStmt = SQLiteUtil.getConnection().prepareStatement(pSql);
-            sqlCache.put(pSql, pStmt);
-        }
-
-        resultSet = pStmt.executeQuery();
-        while (resultSet.next()) {
-            each = resultSet.getString("PATH");
-            checkIsMatchedAndAddToList(each);
-            //用户重新输入了信息
-            if (startTime > time) {
-                break;
+        try (PreparedStatement pStmt = SQLiteUtil.getConnection().prepareStatement(pSql);
+             ResultSet resultSet = pStmt.executeQuery()) {
+            while (resultSet.next()) {
+                each = resultSet.getString("PATH");
+                checkIsMatchedAndAddToList(each);
+                //用户重新输入了信息
+                if (startTime > time) {
+                    break;
+                }
             }
         }
-        resultSet.close();
     }
 
     private int getAscIISum(String path) {
@@ -230,7 +214,7 @@ public class PluginMain extends Plugin {
         File file ;
         for(String str : arr) {
             file = new File(str + ":\\");
-            map.put(str, file.exists());
+            mapDiskExist.put(str, file.exists());
         }
     }
 
@@ -242,12 +226,12 @@ public class PluginMain extends Plugin {
                 file = new File(str + ":\\");
                 // 如果磁盘现在存在，并且以前不存在
                 // 则表示刚插上U盘，返回
-                if(file.exists() && !map.get(str)) {
+                if(file.exists() && !mapDiskExist.get(str)) {
                     disk.append(str).append(";");
                 }
 
-                if(file.exists() != map.get(str)) {
-                    map.put(str, file.exists());
+                if(file.exists() != mapDiskExist.get(str)) {
+                    mapDiskExist.put(str, file.exists());
                 }
             }
             String disks = disk.toString();
@@ -587,9 +571,7 @@ public class PluginMain extends Plugin {
                                             displayMessage("提示", "搜索完成");
                                         }
                                     } catch (IOException | InterruptedException e) {
-                                        if (!(e instanceof InterruptedException)) {
-                                            e.printStackTrace();
-                                        }
+                                        e.printStackTrace();
                                     }
                                 }
                             }
@@ -599,9 +581,7 @@ public class PluginMain extends Plugin {
                     TimeUnit.MILLISECONDS.sleep(50);
                 }
             }catch (Exception e) {
-                if (!(e instanceof InterruptedException)) {
-                    e.printStackTrace();
-                }
+                e.printStackTrace();
             }
         });
     }
@@ -690,7 +670,6 @@ public class PluginMain extends Plugin {
             System.out.println("Unloading plugin UDisk");
             isNotExit = false;
             threadPool.shutdownNow();
-            releaseAllSqlCache();
             SQLiteUtil.clearAllTables();
         }catch (Exception e) {
             e.printStackTrace();
@@ -714,27 +693,7 @@ public class PluginMain extends Plugin {
     public void keyPressed(KeyEvent e, String result) {
         int key = e.getKeyCode();
         if (10 == key) {
-            if (isOpenLastFolderPressed) {
-                //打开上级文件夹
-                File open = new File(result);
-                try {
-                    Runtime.getRuntime().exec("explorer.exe /select, \"" + open.getAbsolutePath() + "\"");
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-            } else if (isRunAsAdminPressed) {
-                openWithAdmin(result);
-            } else if (isCopyPathPressed) {
-                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                Transferable trans = new StringSelection(result);
-                clipboard.setContents(trans, null);
-            } else {
-                if (result.endsWith(".bat") || result.endsWith(".cmd")) {
-                    openWithAdmin(result);
-                } else {
-                    openWithoutAdmin(result);
-                }
-            }
+            openFile(result);
         }else if (openLastFolderKeyCode == key) {
             //打开上级文件夹热键被点击
             isOpenLastFolderPressed = true;
@@ -753,6 +712,10 @@ public class PluginMain extends Plugin {
 
     @Override
     public void mousePressed(MouseEvent e, String result) {
+        openFile(result);
+    }
+
+    private void openFile(String result) {
         if (isOpenLastFolderPressed) {
             //打开上级文件夹
             File open = new File(result);
@@ -768,18 +731,12 @@ public class PluginMain extends Plugin {
             Transferable trans = new StringSelection(result);
             clipboard.setContents(trans, null);
         } else {
-            if (result.endsWith(".bat") || result.endsWith(".cmd")) {
-                openWithAdmin(result);
-            } else {
-                openWithoutAdmin(result);
-            }
+            openWithoutAdmin(result);
         }
     }
 
     @Override
-    public void mouseReleased(MouseEvent e, String result) {
-
-    }
+    public void mouseReleased(MouseEvent e, String result) {}
 
     @Override
     public ImageIcon getPluginIcon() {
@@ -839,7 +796,7 @@ public class PluginMain extends Plugin {
     }
 
     @Override
-    public boolean isLatest() {
+    public boolean isLatest() throws Exception {
         return VersionCheckUtil._isLatest();
     }
 
