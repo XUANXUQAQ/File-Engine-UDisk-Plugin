@@ -13,6 +13,5 @@ public class SearchUDisk {
         String command = "cmd.exe /c " + start + end + " \"" + path + "\"" + " \"" + 10 + "\" " + "\"" + "placeholder" + "\" " + "\"" + database.getAbsolutePath() + "\" " + "\"" + "0" + "\"";
         Process p = Runtime.getRuntime().exec(command, null, new File("user"));
         p.waitFor();
-        System.out.println("Search " + path + " done");
     }
 }

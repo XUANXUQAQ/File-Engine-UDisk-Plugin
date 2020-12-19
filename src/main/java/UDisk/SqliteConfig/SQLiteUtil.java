@@ -46,7 +46,7 @@ public class SQLiteUtil {
         try (Statement stmt = getStatement()) {
             stmt.execute("BEGIN;");
             for (int i = 0; i <= 40; i++) {
-                String command = sql + i + " " + "(PATH text unique)" + ";";
+                String command = sql + i + " " + "(ASCII int, PATH text unique)" + ";";
                 stmt.executeUpdate(command);
             }
             stmt.execute("COMMIT;");
