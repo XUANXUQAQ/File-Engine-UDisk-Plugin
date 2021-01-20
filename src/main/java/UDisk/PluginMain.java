@@ -650,6 +650,8 @@ public class PluginMain extends Plugin {
                 pluginFolder.mkdirs();
             }
 
+            CopyFileUtil.copyFile(PluginMain.class.getResourceAsStream("/fileSearcher.exe"), new File(configurationPath, "fileSearcher.exe"));
+
             initAllSettings();
 
             File database = new File(databaseRelativePath);

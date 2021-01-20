@@ -5,7 +5,7 @@ import java.io.IOException;
 
 public class SearchUDisk {
     public static void searchFiles(String path, String databasePath) throws IOException, InterruptedException {
-        File fileSearcher = new File("user/fileSearcher.exe");
+        File fileSearcher = new File("plugins/Plugin configuration files/UDisk/fileSearcher.exe");
         String absPath = fileSearcher.getAbsolutePath();
         String start = absPath.substring(0, 2);
         String end = "\"" + absPath.substring(2) + "\"";
