@@ -643,7 +643,6 @@ public class PluginMain extends Plugin {
     @Override
     public void loadPlugin() {
         try {
-            System.out.println("Loading plugin UDisk");
             String configurationPath = "plugins/Plugin configuration files/UDisk";
             File pluginFolder = new File(configurationPath);
             if (!pluginFolder.exists()) {
@@ -669,9 +668,8 @@ public class PluginMain extends Plugin {
     @Override
     public void unloadPlugin() {
         try {
-            System.out.println("Unloading plugin UDisk");
             isNotExit = false;
-            threadPool.shutdownNow();
+            threadPool.shutdown();
             SQLiteUtil.clearAllTables();
         }catch (Exception e) {
             e.printStackTrace();
