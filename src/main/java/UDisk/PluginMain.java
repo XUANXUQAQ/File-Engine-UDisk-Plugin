@@ -813,7 +813,6 @@ public class PluginMain extends Plugin {
         String name = getFileName(result);
         ImageIcon icon = GetIconUtil.getBigIcon(result, pluginIconSideLength, pluginIconSideLength);
         label.setIcon(icon);
-        label.setBorder(border);
         label.setText("<html><body>" + name + "<br><font size=\"-1\">" + ">>" + getParentPath(result) + "</body></html>");
         if (isChosen) {
             label.setBackground(pluginLabelColor);
