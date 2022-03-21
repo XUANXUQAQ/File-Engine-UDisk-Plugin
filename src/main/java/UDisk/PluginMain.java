@@ -20,6 +20,8 @@ import java.awt.event.MouseEvent;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -728,6 +730,10 @@ public class PluginMain extends Plugin {
             initAllSettings();
 
             File database = new File(databaseRelativePath);
+            long length = Files.size(Path.of(databaseRelativePath));
+            if (length > 5L * 1024 * 1024 * 100) {
+                database.delete();
+            }
             SQLiteUtil.initConnection("jdbc:sqlite:" + database.getAbsolutePath());
             SQLiteUtil.createAllTables();
 
@@ -744,7 +750,6 @@ public class PluginMain extends Plugin {
         try {
             isNotExit = false;
             threadPool.shutdown();
-            SQLiteUtil.clearAllTables();
         } catch (Exception e) {
             e.printStackTrace();
         }
