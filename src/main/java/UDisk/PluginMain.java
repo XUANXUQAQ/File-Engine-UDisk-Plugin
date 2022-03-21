@@ -723,7 +723,6 @@ public class PluginMain extends Plugin {
             }
             int colorHex = (int) configs.get("fontColorWithCoverage");
             pluginFontColorWithCoverage = new Color(colorHex);
-            System.out.println(pluginFontColorWithCoverage);
             FileUtil.copyFile(PluginMain.class.getResourceAsStream("/fileSearcher.exe"), new File(configurationPath, "fileSearcher.exe"));
 
             initAllSettings();
