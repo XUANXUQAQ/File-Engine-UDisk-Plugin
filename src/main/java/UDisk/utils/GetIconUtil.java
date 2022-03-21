@@ -1,11 +1,9 @@
-package UDisk.GetIcon;
+package UDisk.utils;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileSystemView;
 import java.awt.*;
 import java.io.File;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class GetIconUtil {
     private static final FileSystemView fsv = FileSystemView.getFileSystemView();

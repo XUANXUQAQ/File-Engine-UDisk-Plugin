@@ -1,8 +1,27 @@
-package UDisk;
+package UDisk.utils;
 
 import java.io.*;
 
-public class CopyFileUtil {
+public class FileUtil {
+
+    public static String getParentPath(String path) {
+        File f = new File(path);
+        return f.getParentFile().getAbsolutePath();
+    }
+
+    public static boolean isFile(String text) {
+        File file = new File(text);
+        return file.isFile();
+    }
+
+    public static String getFileName(String path) {
+        if (path != null) {
+            int index = path.lastIndexOf(File.separator);
+            return path.substring(index + 1);
+        }
+        return "";
+    }
+
     public static void copyFile(InputStream source, File dest) {
         try (BufferedInputStream bis = new BufferedInputStream(source);
              BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(dest))) {
@@ -20,12 +39,4 @@ public class CopyFileUtil {
         }
     }
 
-    public static void copyFile(File file, File dest) {
-        try (FileInputStream inputStream = new FileInputStream(file)) {
-            copyFile(inputStream, dest);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 }
-

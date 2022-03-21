@@ -1,4 +1,4 @@
-package UDisk.OpenFile;
+package UDisk.utils;
 
 import javax.swing.*;
 import java.awt.*;

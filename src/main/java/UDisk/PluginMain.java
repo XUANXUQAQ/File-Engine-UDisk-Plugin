@@ -1,9 +1,12 @@
 package UDisk;
 
 import UDisk.DllInterface.GetAscII;
-import UDisk.GetIcon.GetIconUtil;
+import UDisk.utils.ColorUtil;
+import UDisk.utils.FileUtil;
+import UDisk.utils.GetIconUtil;
 import UDisk.SqliteConfig.SQLiteUtil;
 import UDisk.VersionCheck.VersionCheckUtil;
+import UDisk.utils.RegexUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
@@ -20,24 +23,25 @@ import java.nio.charset.StandardCharsets;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
-import static UDisk.OpenFile.OpenFileUtil.openWithAdmin;
-import static UDisk.OpenFile.OpenFileUtil.openWithoutAdmin;
+import static UDisk.utils.OpenFileUtil.openWithAdmin;
+import static UDisk.utils.OpenFileUtil.openWithoutAdmin;
 import static UDisk.Search.SearchUDisk.searchFiles;
 
 public class PluginMain extends Plugin {
     private final String databaseRelativePath = "plugins/Plugin configuration files/UDisk/data.db";
-    private final String[] arr = new String[] {"A","B","C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
+    private final String[] arr = new String[]{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
     private boolean isNotExit = true;
     private long startTime;
     private final ExecutorService threadPool = Executors.newCachedThreadPool();
@@ -54,6 +58,7 @@ public class PluginMain extends Plugin {
     private int pluginIconSideLength = 0;
     private Color pluginLabelColor = new Color(0xcccccc);
     private Color pluginBackgroundColor = new Color(0x333333);
+    private Color pluginFontColorWithCoverage = Color.BLACK;
     private volatile String text;
     private volatile int openLastFolderKeyCode;
     private volatile int runAsAdminKeyCode;
@@ -64,7 +69,7 @@ public class PluginMain extends Plugin {
     private void initDll() {
         try {
             Class.forName("UDisk.DllInterface.GetAscII");
-        }catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
@@ -207,33 +212,28 @@ public class PluginMain extends Plugin {
         return GetAscII.INSTANCE.getAscII(path);
     }
 
-    private String getParentPath(String path) {
-        File f = new File(path);
-        return f.getParent();
-    }
-
     // 初始化磁盘状态，存在true， 否则false
     private void initDiskStatus() {
-        File file ;
-        for(String str : arr) {
+        File file;
+        for (String str : arr) {
             file = new File(str + ":\\");
             mapDiskExist.put(str, file.exists());
         }
     }
 
     private String[] checkUDisk() {
-        File file ;
+        File file;
         StringBuilder disk = new StringBuilder();
-        for(;;) {
-            for(String str : arr) {
+        for (; ; ) {
+            for (String str : arr) {
                 file = new File(str + ":\\");
                 // 如果磁盘现在存在，并且以前不存在
                 // 则表示刚插上U盘，返回
-                if(file.exists() && !mapDiskExist.get(str)) {
+                if (file.exists() && !mapDiskExist.get(str)) {
                     disk.append(str).append(";");
                 }
 
-                if(file.exists() != mapDiskExist.get(str)) {
+                if (file.exists() != mapDiskExist.get(str)) {
                     mapDiskExist.put(str, file.exists());
                 }
             }
@@ -587,7 +587,7 @@ public class PluginMain extends Plugin {
                     }
                     TimeUnit.MILLISECONDS.sleep(50);
                 }
-            }catch (Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         });
@@ -633,8 +633,9 @@ public class PluginMain extends Plugin {
 
     /**
      * Do Not Remove, this is used for File-Engine to restore the handler which the plugin is registered.
-     * @see #restoreFileEngineEventHandler(String)
+     *
      * @return Event class fully-qualified name
+     * @see #restoreFileEngineEventHandler(String)
      */
     @SuppressWarnings("unused")
     public String restoreFileEngineEventHandler() {
@@ -720,8 +721,10 @@ public class PluginMain extends Plugin {
             if (!pluginFolder.exists()) {
                 pluginFolder.mkdirs();
             }
-
-            CopyFileUtil.copyFile(PluginMain.class.getResourceAsStream("/fileSearcher.exe"), new File(configurationPath, "fileSearcher.exe"));
+            int colorHex = (int) configs.get("fontColorWithCoverage");
+            pluginFontColorWithCoverage = new Color(colorHex);
+            System.out.println(pluginFontColorWithCoverage);
+            FileUtil.copyFile(PluginMain.class.getResourceAsStream("/fileSearcher.exe"), new File(configurationPath, "fileSearcher.exe"));
 
             initAllSettings();
 
@@ -743,7 +746,7 @@ public class PluginMain extends Plugin {
             isNotExit = false;
             threadPool.shutdown();
             SQLiteUtil.clearAllTables();
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -766,7 +769,7 @@ public class PluginMain extends Plugin {
         int key = e.getKeyCode();
         if (10 == key) {
             openFile(result);
-        }else if (openLastFolderKeyCode == key) {
+        } else if (openLastFolderKeyCode == key) {
             //打开上级文件夹热键被点击
             isOpenLastFolderPressed = true;
         } else if (runAsAdminKeyCode == key) {
@@ -808,7 +811,8 @@ public class PluginMain extends Plugin {
     }
 
     @Override
-    public void mouseReleased(MouseEvent e, String result) {}
+    public void mouseReleased(MouseEvent e, String result) {
+    }
 
     @Override
     public ImageIcon getPluginIcon() {
@@ -877,15 +881,122 @@ public class PluginMain extends Plugin {
         return VersionCheckUtil._getUpdateURL();
     }
 
+    /**
+     * @param label JLabel
+     * @return 计算出的每个label可显示的最大字符数量
+     */
+    private int getMaxShowCharsNum(JLabel label) {
+        int fontSize = (int) ((label.getFont().getSize() / 96.0f * 72) / 2);
+        return Math.max(label.getWidth() / fontSize, 20);
+    }
+
+    /**
+     * 高亮显示
+     *
+     * @param html     待处理的html
+     * @param keywords 高亮关键字
+     * @return 处理后带html
+     */
+    private String highLight(String html, String[] keywords) {
+        StringBuilder builder = new StringBuilder();
+        List<String> collect = Arrays.stream(keywords).sorted((o1, o2) -> o2.length() - o1.length()).collect(Collectors.toList());
+        for (String keyword : collect) {
+            if (!keyword.isBlank()) {
+                builder.append(keyword).append("|");
+            }
+        }
+        if (builder.length() > 0) {
+            String pattern = builder.substring(0, builder.length() - 1);
+            Pattern compile = RegexUtil.getPattern(pattern, Pattern.CASE_INSENSITIVE);
+            Matcher matcher = compile.matcher(html);
+            html = matcher.replaceAll((matchResult) -> {
+                String group = matchResult.group();
+                String s = "#" + ColorUtil.parseColorHex(pluginFontColorWithCoverage);
+                return "<span style=\"color: " + s + ";\">" + group + "</span>";
+            });
+            return html;
+        }
+        return html;
+    }
+
+    /**
+     * 根据path或command生成显示html
+     *
+     * @param path path
+     * @return html
+     */
+    private String getHtml(String path, boolean[] isParentPathEmpty, JLabel label) {
+        String template = "<html><body>%s</body></html>";
+        isParentPathEmpty[0] = false;
+        // 普通模式
+        int maxShowCharNum = getMaxShowCharsNum(label);
+        String parentPath = FileUtil.getParentPath(path);
+        String fileName = FileUtil.getFileName(path);
+        int blankNUm = 20;
+        int charNumbers = fileName.length() + parentPath.length() + 20;
+        if (charNumbers > maxShowCharNum) {
+            parentPath = getContractPath(parentPath, maxShowCharNum);
+            isParentPathEmpty[0] = parentPath.isEmpty();
+        } else {
+            blankNUm = Math.max(maxShowCharNum - fileName.length() - parentPath.length() - 20, 20);
+        }
+        return String.format(template,
+                "<div>" +
+                        highLight(fileName, keywords) +
+                        "<font size=\"-2\">" +
+                        getBlank(blankNUm) + parentPath +
+                        "</font>" +
+                        "</div>");
+    }
+
+    /**
+     * 在路径中添加省略号
+     *
+     * @param path               path
+     * @param maxShowingCharsNum 最大可显示字符数量
+     * @return 生成后的字符串
+     */
+    private String getContractPath(String path, int maxShowingCharsNum) {
+        String[] split = RegexUtil.getPattern("\\\\", 0).split(path);
+        StringBuilder tmpPath = new StringBuilder();
+        int contractLimit = 35;
+        for (String tmp : split) {
+            if (tmp.length() > contractLimit) {
+                tmpPath.append(tmp, 0, contractLimit).append("...").append("\\");
+            } else {
+                tmpPath.append(tmp).append("\\");
+            }
+        }
+        if (tmpPath.length() > maxShowingCharsNum) {
+            return "";
+        }
+        return tmpPath.toString();
+    }
+
+    private String getBlank(int num) {
+        return "&nbsp;".repeat(Math.max(0, num));
+    }
+
     @Override
     public void showResultOnLabel(String result, JLabel label, boolean isChosen) {
         if (pluginIconSideLength == 0) {
             pluginIconSideLength = label.getHeight() / 3;
         }
-        String name = getFileName(result);
+        //将文件的路径信息存储在label的名称中，在未被选中时只显示文件名，选中后才显示文件路径
+        boolean[] isParentPathEmpty = new boolean[1];
+        String allHtml = getHtml(result, isParentPathEmpty, label);
+        if (isParentPathEmpty[0]) {
+            int maxShowCharsNum = getMaxShowCharsNum(label);
+            boolean isContract = result.length() > maxShowCharsNum;
+            int subNum = Math.max(0, maxShowCharsNum - "...".length() - 20);
+            subNum = Math.min(result.length(), subNum);
+            String showPath = isContract ? result.substring(0, subNum) : result;
+            String add = isContract ? "..." : "";
+            label.setName("<html><body>" + highLight(FileUtil.getFileName(result), keywords) + getBlank(20) + "<font size=\"-2\">" + showPath + add + "</font></body></html>");
+        }
+        label.setText(allHtml);
         ImageIcon icon = GetIconUtil.getBigIcon(result, pluginIconSideLength, pluginIconSideLength);
         label.setIcon(icon);
-        label.setText("<html><body>" + name + "<br><font size=\"-1\">" + ">>" + getParentPath(result) + "</body></html>");
         if (isChosen) {
             label.setBackground(pluginLabelColor);
         } else {
