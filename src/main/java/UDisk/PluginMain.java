@@ -1,6 +1,7 @@
 package UDisk;
 
 import UDisk.DllInterface.GetAscII;
+import UDisk.DllInterface.IsLocalDisk;
 import UDisk.utils.ColorUtil;
 import UDisk.utils.FileUtil;
 import UDisk.utils.GetIconUtil;
@@ -71,6 +72,7 @@ public class PluginMain extends Plugin {
     private void initDll() {
         try {
             Class.forName("UDisk.DllInterface.GetAscII");
+            Class.forName("UDisk.DllInterface.IsLocalDisk");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -532,7 +534,11 @@ public class PluginMain extends Plugin {
             while (isNotExit) {
                 disks = checkUDisk();
                 for (String UDisk : disks) {
-                    displayMessage("提示", "输入 " + "\"" + " >udisk >" + UDisk + "\"" + " 来创建索引");
+                    if (IsLocalDisk.INSTANCE.isDiskNTFS(UDisk + ":\\")) {
+                        displayMessage("提示", "检测到插入的磁盘为NTFS格式，可以加入到主程序进行索引，无需使用插件");
+                    } else {
+                        displayMessage("提示", "输入 " + "\"" + " >udisk >" + UDisk + "\"" + " 来创建索引");
+                    }
                 }
             }
         });
