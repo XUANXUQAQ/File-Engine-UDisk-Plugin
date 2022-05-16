@@ -1,13 +1,10 @@
 package UDisk.DllInterface;
 
-import java.nio.file.Path;
+import com.sun.jna.Library;
+import com.sun.jna.Native;
 
-public enum IsLocalDisk {
-    INSTANCE;
+public interface IsLocalDisk extends Library {
+    IsLocalDisk INSTANCE = Native.load("isLocalDisk", IsLocalDisk.class);
 
-    static {
-        System.load(Path.of("user/isLocalDisk.dll").toAbsolutePath().toString());
-    }
-
-    public native boolean isDiskNTFS(String disk);
+    boolean isDiskNTFS(String disk);
 }

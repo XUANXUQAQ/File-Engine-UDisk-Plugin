@@ -731,21 +731,27 @@ public class PluginMain extends Plugin {
             }
             int colorHex = (int) configs.get("fontColorWithCoverage");
             pluginFontColorWithCoverage = new Color(colorHex);
-            FileUtil.copyFile(PluginMain.class.getResourceAsStream("/fileSearcher.exe"), new File(configurationPath, "fileSearcher.exe"));
+//            FileUtil.copyFile(PluginMain.class.getResourceAsStream("/fileSearcher.exe"), new File(configurationPath, "fileSearcher.exe"));
+//            FileUtil.copyFile(PluginMain.class.getResourceAsStream("/win32-x86-64/getAscII.dll"), new File(configurationPath, "win32-x86-64/getAscII.dll"));
+//            FileUtil.copyFile(PluginMain.class.getResourceAsStream("/win32-x86-64/isLocalDisk.dll"), new File(configurationPath, "win32-x86-64/isLocalDisk.dll"));
 
             initAllSettings();
 
-            File database = new File(databaseRelativePath);
-            long length = Files.size(Path.of(databaseRelativePath));
-            if (length > 5L * 1024 * 1024 * 100) {
-                database.delete();
+            Path databaseFilePath = Path.of(databaseRelativePath);
+            if (Files.exists(databaseFilePath)) {
+                long length = Files.size(databaseFilePath);
+                if (length > 5L * 1024 * 1024 * 100) {
+                    Files.delete(databaseFilePath);
+                }
             }
-            SQLiteUtil.initConnection("jdbc:sqlite:" + database.getAbsolutePath());
+            SQLiteUtil.initConnection("jdbc:sqlite:" + databaseFilePath.toAbsolutePath());
             SQLiteUtil.createAllTables();
 
             initDll();
             initDiskStatus();
+            System.out.println("udisk: start thread pool");
             initThreadPool();
+            System.out.println("udisk: init done");
         } catch (Exception e) {
             e.printStackTrace();
         }
