@@ -2,12 +2,9 @@ package UDisk;
 
 import UDisk.DllInterface.GetAscII;
 import UDisk.DllInterface.IsLocalDisk;
-import UDisk.utils.ColorUtil;
-import UDisk.utils.FileUtil;
-import UDisk.utils.GetIconUtil;
+import UDisk.utils.*;
 import UDisk.SqliteConfig.SQLiteUtil;
 import UDisk.VersionCheck.VersionCheckUtil;
-import UDisk.utils.RegexUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
@@ -51,8 +48,6 @@ public class PluginMain extends Plugin {
     private volatile String[] searchCase;
     private volatile String searchText;
     private static volatile String[] keywords;
-    private final Pattern colon = Pattern.compile(":");
-    private final Pattern semicolon = Pattern.compile(";");
     private final ConcurrentLinkedQueue<String> commandQueue = new ConcurrentLinkedQueue<>();
     private volatile boolean isRunAsAdminPressed = false;
     private volatile boolean isCopyPathPressed = false;
@@ -78,35 +73,6 @@ public class PluginMain extends Plugin {
         }
     }
 
-    private String getFileName(String path) {
-        int index = path.lastIndexOf(File.separator);
-        return path.substring(index + 1);
-    }
-
-    private boolean isFile(String path) {
-        File file = new File(path);
-        return file.isFile();
-    }
-
-    private boolean isDirectory(String text) {
-        File file = new File(text);
-        return file.isDirectory();
-    }
-
-    private boolean isMatched(String name, boolean isIgnoreCase) {
-        for (String each : keywords) {
-            if (isIgnoreCase) {
-                if (!name.toLowerCase().contains(each.toLowerCase())) {
-                    return false;
-                }
-            } else {
-                if (!name.contains(each)) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
 
     private void initAllSettings() {
         String line;
@@ -140,51 +106,13 @@ public class PluginMain extends Plugin {
         }
     }
 
-    private boolean check(String path) {
-        String name = getFileName(path);
-        if (searchCase == null || searchCase.length == 0) {
-            return isMatched(name, true);
-        } else {
-            if (isMatched(name, true)) {
-                for (String eachCase : searchCase) {
-                    switch (eachCase) {
-                        case "f":
-                            if (!isFile(path)) {
-                                return false;
-                            }
-                            break;
-                        case "d":
-                            if (!isDirectory(path)) {
-                                return false;
-                            }
-                            break;
-                        case "full":
-                            if (!name.equalsIgnoreCase(searchText)) {
-                                return false;
-                            }
-                            break;
-                        case "case":
-                            if (!isMatched(name, false)) {
-                                return false;
-                            }
-                        default:
-                            break;
-                    }
-                }
-                //所有规则均已匹配
-                return true;
-            }
-        }
-        return false;
-    }
-
     private boolean isExist(String path) {
         File f = new File(path);
         return f.exists();
     }
 
     private void checkIsMatchedAndAddToList(String path) {
-        if (check(path)) {
+        if (PathMatchUtil.check(path, searchCase, searchText, keywords)) {
             if (isExist(path)) {
                 addToResultQueue(path);
             }
@@ -243,7 +171,7 @@ public class PluginMain extends Plugin {
             }
             String disks = disk.toString();
             if (!disks.isEmpty()) {
-                return semicolon.split(disks);
+                return RegexUtil.semicolon.split(disks);
             }
 
             try {
@@ -556,8 +484,8 @@ public class PluginMain extends Plugin {
                     }
                     TimeUnit.MILLISECONDS.sleep(10);
                 }
-            } catch (InterruptedException ignored) {
-
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         });
 
@@ -568,7 +496,7 @@ public class PluginMain extends Plugin {
                     endTime = System.currentTimeMillis();
                     if ((endTime - startTime > 500) && (timer) && !isIndexMode) {
                         timer = false;
-                        String name = getFileName(searchText.toUpperCase());
+                        String name = FileUtil.getFileName(searchText.toUpperCase());
                         int ascII = getAscIISum(name);
                         int asciiGroup = ascII / 100;
 
@@ -581,16 +509,22 @@ public class PluginMain extends Plugin {
                                 String searchPath = text.charAt(1) + ":";
                                 if (!":".equals(searchPath)) {
                                     try {
-                                        if (new File(searchPath + "\\").exists()) {
-                                            searchFiles(searchPath, databaseRelativePath);
-                                            displayMessage("提示", "搜索完成");
+                                        File file = new File(searchPath + "\\");
+                                        if (file.exists()) {
+                                            if (IsLocalDisk.INSTANCE.isDiskNTFS(file.getAbsolutePath())) {
+                                                displayMessage("提示", "该磁盘为NTFS格式，可以添加进入主程序进行搜索，速度相较于插件更快");
+                                            } else {
+                                                searchFiles(searchPath, databaseRelativePath);
+                                                displayMessage("提示", "搜索完成");
+                                            }
                                         }
                                     } catch (IOException | InterruptedException e) {
                                         e.printStackTrace();
                                     }
                                 }
                             }
-                        } catch (StringIndexOutOfBoundsException ignored) {
+                        } catch (StringIndexOutOfBoundsException e) {
+                            e.printStackTrace();
                         }
                     }
                     TimeUnit.MILLISECONDS.sleep(50);
@@ -698,16 +632,16 @@ public class PluginMain extends Plugin {
             } else {
                 String[] strings;
                 int length;
-                strings = colon.split(_text);
+                strings = RegexUtil.colon.split(_text);
                 length = strings.length;
                 if (length == 2) {
-                    searchCase = semicolon.split(strings[1].toLowerCase());
+                    searchCase = RegexUtil.semicolon.split(strings[1].toLowerCase());
                     searchText = strings[0];
                 } else {
                     searchText = strings[0];
                     searchCase = null;
                 }
-                keywords = semicolon.split(searchText);
+                keywords = RegexUtil.semicolon.split(searchText);
                 isIndexMode = false;
             }
             commandQueue.clear();
@@ -731,10 +665,6 @@ public class PluginMain extends Plugin {
             }
             int colorHex = (int) configs.get("fontColorWithCoverage");
             pluginFontColorWithCoverage = new Color(colorHex);
-//            FileUtil.copyFile(PluginMain.class.getResourceAsStream("/fileSearcher.exe"), new File(configurationPath, "fileSearcher.exe"));
-//            FileUtil.copyFile(PluginMain.class.getResourceAsStream("/win32-x86-64/getAscII.dll"), new File(configurationPath, "win32-x86-64/getAscII.dll"));
-//            FileUtil.copyFile(PluginMain.class.getResourceAsStream("/win32-x86-64/isLocalDisk.dll"), new File(configurationPath, "win32-x86-64/isLocalDisk.dll"));
-
             initAllSettings();
 
             Path databaseFilePath = Path.of(databaseRelativePath);
@@ -749,9 +679,9 @@ public class PluginMain extends Plugin {
 
             initDll();
             initDiskStatus();
-            System.out.println("udisk: start thread pool");
+            System.out.println("UDisk: starting thread pool...");
             initThreadPool();
-            System.out.println("udisk: init done");
+            System.out.println("UDisk: init done.");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -921,6 +851,15 @@ public class PluginMain extends Plugin {
                 builder.append(keyword).append("|");
             }
         }
+        // 挑出所有的中文字符
+        Map<String, String> chinesePinyinMap = PinyinUtil.getChinesePinyinMap(html);
+        // 转换成拼音后和keywords匹配，如果发现匹配出成功，则添加到正则表达式中
+        chinesePinyinMap.entrySet()
+                .stream()
+                .filter(pair -> Arrays.stream(keywords)
+                        .anyMatch(each -> each.toLowerCase(Locale.ROOT).indexOf(pair.getValue().toLowerCase(Locale.ROOT)) != -1))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
+                .forEach((k, v) -> builder.append(k).append("|"));
         if (builder.length() > 0) {
             String pattern = builder.substring(0, builder.length() - 1);
             Pattern compile = RegexUtil.getPattern(pattern, Pattern.CASE_INSENSITIVE);

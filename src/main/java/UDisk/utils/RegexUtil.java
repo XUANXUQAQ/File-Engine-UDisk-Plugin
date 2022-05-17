@@ -5,6 +5,8 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.regex.Pattern;
 
 public class RegexUtil {
+    public static final Pattern colon = Pattern.compile(":");
+    public static final Pattern semicolon = Pattern.compile(";");
     private static final ConcurrentSkipListMap<String, WeakReference<Pattern>> patternMap = new ConcurrentSkipListMap<>();
 
     private static final int MAX_PATTERN_CACHE_NUM = 10;
