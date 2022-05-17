@@ -1,10 +1,9 @@
 package UDisk;
 
-import UDisk.DllInterface.GetAscII;
 import UDisk.DllInterface.IsLocalDisk;
-import UDisk.utils.*;
 import UDisk.SqliteConfig.SQLiteUtil;
 import UDisk.VersionCheck.VersionCheckUtil;
+import UDisk.utils.*;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
@@ -20,11 +19,11 @@ import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.sql.Statement;
 import java.util.List;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -35,9 +34,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static UDisk.Search.SearchUDisk.searchFiles;
 import static UDisk.utils.OpenFileUtil.openWithAdmin;
 import static UDisk.utils.OpenFileUtil.openWithoutAdmin;
-import static UDisk.Search.SearchUDisk.searchFiles;
 
 public class PluginMain extends Plugin {
     private final String databaseRelativePath = "plugins/Plugin configuration files/UDisk/data.db";
@@ -66,7 +65,6 @@ public class PluginMain extends Plugin {
 
     private void initDll() {
         try {
-            Class.forName("UDisk.DllInterface.GetAscII");
             Class.forName("UDisk.DllInterface.IsLocalDisk");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
@@ -123,8 +121,8 @@ public class PluginMain extends Plugin {
         //为label添加结果
         String each;
         String pSql = "SELECT PATH FROM " + column + ";";
-        try (PreparedStatement pStmt = SQLiteUtil.getConnection().prepareStatement(pSql);
-             ResultSet resultSet = pStmt.executeQuery()) {
+        try (Statement pStmt = SQLiteUtil.getConnection().createStatement();
+             ResultSet resultSet = pStmt.executeQuery(pSql)) {
             while (resultSet.next()) {
                 each = resultSet.getString("PATH");
                 checkIsMatchedAndAddToList(each);
@@ -134,14 +132,6 @@ public class PluginMain extends Plugin {
                 }
             }
         }
-    }
-
-    private int getAscIISum(String path) {
-        path = path.toUpperCase();
-        if (path.contains(";")) {
-            path = path.replace(";", "");
-        }
-        return GetAscII.INSTANCE.getAscII(path);
     }
 
     // 初始化磁盘状态，存在true， 否则false
@@ -181,278 +171,11 @@ public class PluginMain extends Plugin {
         }
     }
 
-    private void addCommandsByAsciiGroup(int asciiGroup) {
+    private void addTables() {
         String command;
-        switch (asciiGroup) {
-            case 0:
-                for (int i = 0; i < 40; i++) {
-                    command = "list" + i;
-                    commandQueue.add(command);
-                }
-                break;
-            case 1:
-                for (int i = 1; i < 40; i++) {
-                    command = "list" + i;
-                    commandQueue.add(command);
-                }
-                break;
-
-            case 2:
-                for (int i = 2; i < 40; i++) {
-                    command = "list" + i;
-                    commandQueue.add(command);
-                }
-                break;
-
-            case 3:
-                for (int i = 3; i < 40; i++) {
-                    command = "list" + i;
-                    commandQueue.add(command);
-                }
-                break;
-
-            case 4:
-                for (int i = 4; i < 40; i++) {
-                    command = "list" + i;
-                    commandQueue.add(command);
-                }
-                break;
-
-            case 5:
-                for (int i = 5; i < 40; i++) {
-                    command = "list" + i;
-                    commandQueue.add(command);
-                }
-                break;
-            case 6:
-                for (int i = 6; i < 40; i++) {
-                    command = "list" + i;
-                    commandQueue.add(command);
-                }
-                break;
-
-            case 7:
-                for (int i = 7; i < 40; i++) {
-                    command = "list" + i;
-                    commandQueue.add(command);
-                }
-                break;
-
-            case 8:
-                for (int i = 8; i < 40; i++) {
-                    command = "list" + i;
-                    commandQueue.add(command);
-                }
-                break;
-
-            case 9:
-                for (int i = 9; i < 40; i++) {
-                    command = "list" + i;
-                    commandQueue.add(command);
-                }
-                break;
-
-            case 10:
-                for (int i = 10; i < 40; i++) {
-                    command = "list" + i;
-                    commandQueue.add(command);
-                }
-                break;
-
-            case 11:
-                for (int i = 11; i < 40; i++) {
-                    command = "list" + i;
-                    commandQueue.add(command);
-                }
-                break;
-
-            case 12:
-                for (int i = 12; i < 40; i++) {
-                    command = "list" + i;
-                    commandQueue.add(command);
-                }
-                break;
-
-            case 13:
-                for (int i = 13; i < 40; i++) {
-                    command = "list" + i;
-                    commandQueue.add(command);
-                }
-                break;
-
-            case 14:
-                for (int i = 14; i < 40; i++) {
-                    command = "list" + i;
-                    commandQueue.add(command);
-                }
-                break;
-
-            case 15:
-                for (int i = 15; i < 40; i++) {
-                    command = "list" + i;
-                    commandQueue.add(command);
-                }
-                break;
-
-            case 16:
-                for (int i = 16; i < 40; i++) {
-                    command = "list" + i;
-                    commandQueue.add(command);
-                }
-                break;
-
-            case 17:
-                for (int i = 17; i < 40; i++) {
-                    command = "list" + i;
-                    commandQueue.add(command);
-                }
-                break;
-
-            case 18:
-                for (int i = 18; i < 40; i++) {
-                    command = "list" + i;
-                    commandQueue.add(command);
-                }
-                break;
-
-            case 19:
-                for (int i = 19; i < 40; i++) {
-                    command = "list" + i;
-                    commandQueue.add(command);
-                }
-                break;
-
-            case 20:
-                for (int i = 20; i < 40; i++) {
-                    command = "list" + i;
-                    commandQueue.add(command);
-                }
-                break;
-
-            case 21:
-                for (int i = 21; i < 40; i++) {
-                    command = "list" + i;
-                    commandQueue.add(command);
-                }
-                break;
-
-            case 22:
-                for (int i = 22; i < 40; i++) {
-                    command = "list" + i;
-                    commandQueue.add(command);
-                }
-                break;
-
-            case 23:
-                for (int i = 23; i < 40; i++) {
-                    command = "list" + i;
-                    commandQueue.add(command);
-                }
-                break;
-
-            case 24:
-                for (int i = 24; i < 40; i++) {
-                    command = "list" + i;
-                    commandQueue.add(command);
-                }
-                break;
-
-            case 25:
-                for (int i = 25; i < 40; i++) {
-                    command = "list" + i;
-                    commandQueue.add(command);
-                }
-                break;
-            case 26:
-                for (int i = 26; i < 40; i++) {
-                    command = "list" + i;
-                    commandQueue.add(command);
-                }
-                break;
-            case 27:
-                for (int i = 27; i < 40; i++) {
-                    command = "list" + i;
-                    commandQueue.add(command);
-                }
-                break;
-            case 28:
-                for (int i = 28; i < 40; i++) {
-                    command = "list" + i;
-                    commandQueue.add(command);
-                }
-                break;
-            case 29:
-                for (int i = 29; i < 40; i++) {
-                    command = "list" + i;
-                    commandQueue.add(command);
-                }
-                break;
-            case 30:
-                for (int i = 30; i < 40; i++) {
-                    command = "list" + i;
-                    commandQueue.add(command);
-                }
-                break;
-            case 31:
-                for (int i = 31; i < 40; i++) {
-                    command = "list" + i;
-                    commandQueue.add(command);
-                }
-                break;
-            case 32:
-                for (int i = 32; i < 40; i++) {
-                    command = "list" + i;
-                    commandQueue.add(command);
-                }
-                break;
-            case 33:
-                for (int i = 33; i < 40; i++) {
-                    command = "list" + i;
-                    commandQueue.add(command);
-                }
-                break;
-            case 34:
-                for (int i = 34; i < 40; i++) {
-                    command = "list" + i;
-                    commandQueue.add(command);
-                }
-                break;
-            case 35:
-                for (int i = 35; i < 40; i++) {
-                    command = "list" + i;
-                    commandQueue.add(command);
-                }
-                break;
-            case 36:
-                for (int i = 36; i < 40; i++) {
-                    command = "list" + i;
-                    commandQueue.add(command);
-                }
-                break;
-            case 37:
-                for (int i = 37; i < 40; i++) {
-                    command = "list" + i;
-                    commandQueue.add(command);
-                }
-                break;
-            case 38:
-                for (int i = 38; i < 40; i++) {
-                    command = "list" + i;
-                    commandQueue.add(command);
-                }
-                break;
-            case 39:
-                for (int i = 39; i < 40; i++) {
-                    command = "list" + i;
-                    commandQueue.add(command);
-                }
-                break;
-            case 40:
-                command = "list40";
-                commandQueue.add(command);
-                break;
-            default:
-                break;
+        for (int i = 0; i <= 40; i++) {
+            command = "list" + i;
+            commandQueue.add(command);
         }
     }
 
@@ -496,11 +219,7 @@ public class PluginMain extends Plugin {
                     endTime = System.currentTimeMillis();
                     if ((endTime - startTime > 500) && (timer) && !isIndexMode) {
                         timer = false;
-                        String name = FileUtil.getFileName(searchText.toUpperCase());
-                        int ascII = getAscIISum(name);
-                        int asciiGroup = ascII / 100;
-
-                        addCommandsByAsciiGroup(asciiGroup);
+                        addTables();
                     } else if ((endTime - startTime > 500) && (timer) && isIndexMode) {
                         timer = false;
                         isIndexMode = false;
