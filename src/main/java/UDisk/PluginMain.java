@@ -402,7 +402,7 @@ public class PluginMain extends Plugin {
             initThreadPool();
             System.out.println("UDisk: init done.");
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
