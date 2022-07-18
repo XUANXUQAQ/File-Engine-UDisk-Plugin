@@ -276,14 +276,25 @@ public class PluginMain extends Plugin {
 
     @Override
     public void searchBarVisible(String showingMode) {
-
+        isRunAsAdminPressed = false;
+        isOpenLastFolderPressed = false;
+        isCopyPathPressed = false;
     }
 
     @Override
     public void configsChanged(Map<String, Object> configs) {
-
+        initAllSettings(configs);
     }
 
+    private void initAllSettings(Map<String, Object> configs) {
+        final int colorHex = (int) configs.getOrDefault("fontColorWithCoverage", 0);
+        pluginFontColorWithCoverage = new Color(colorHex);
+        openLastFolderKeyCode = (int) configs.getOrDefault("openLastFolderKeyCode", 17);
+        runAsAdminKeyCode = (int) configs.getOrDefault("runAsAdminKeyCode", 16);
+        copyPathKeyCode = (int) configs.getOrDefault("copyPathKeyCode", 18);
+    }
+
+    @SuppressWarnings("unchecked")
     @Override
     public void eventProcessed(Class<?> c, Object eventInstance) {
         if ("file.engine.event.handler.impl.database.StartSearchEvent".equals(c.getName())) {
@@ -345,13 +356,11 @@ public class PluginMain extends Plugin {
             String configurationPath = "plugins/Plugin configuration files/UDisk";
             File pluginFolder = new File(configurationPath);
             if (!pluginFolder.exists()) {
-                pluginFolder.mkdirs();
+                if (!pluginFolder.mkdirs()) {
+                    throw new RuntimeException("mkdir " + pluginFolder + "failed.");
+                }
             }
-            final int colorHex = (int) configs.getOrDefault("fontColorWithCoverage", 0);
-            pluginFontColorWithCoverage = new Color(colorHex);
-            openLastFolderKeyCode = (int) configs.getOrDefault("openLastFolderKeyCode", 17);
-            runAsAdminKeyCode = (int) configs.getOrDefault("runAsAdminKeyCode", 16);
-            copyPathKeyCode = (int) configs.getOrDefault("copyPathKeyCode", 18);
+            initAllSettings(configs);
             Path databaseFilePath = Path.of(databaseRelativePath);
             if (Files.exists(databaseFilePath)) {
                 long length = Files.size(databaseFilePath);
