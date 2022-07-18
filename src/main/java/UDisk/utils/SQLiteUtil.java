@@ -1,4 +1,4 @@
-package UDisk.SqliteConfig;
+package UDisk.utils;
 
 import org.sqlite.SQLiteConfig;
 

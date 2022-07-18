@@ -1,13 +1,12 @@
 package UDisk.utils;
 
-import java.lang.ref.WeakReference;
+import java.lang.ref.SoftReference;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.regex.Pattern;
 
 public class RegexUtil {
-    public static final Pattern colon = Pattern.compile(":");
     public static final Pattern semicolon = Pattern.compile(";");
-    private static final ConcurrentSkipListMap<String, WeakReference<Pattern>> patternMap = new ConcurrentSkipListMap<>();
+    private static final ConcurrentSkipListMap<String, SoftReference<Pattern>> patternMap = new ConcurrentSkipListMap<>();
 
     private static final int MAX_PATTERN_CACHE_NUM = 10;
 
@@ -20,10 +19,10 @@ public class RegexUtil {
      */
     public static Pattern getPattern(String patternStr, int flags) {
         String key = patternStr + ":flags:" + flags;
-        WeakReference<Pattern> pattern = patternMap.get(key);
+        SoftReference<Pattern> pattern = patternMap.get(key);
         if (pattern == null) {
             Pattern compile = Pattern.compile(patternStr, flags);
-            pattern = new WeakReference<>(compile);
+            pattern = new SoftReference<>(compile);
             if (patternMap.size() < MAX_PATTERN_CACHE_NUM) {
                 patternMap.put(key, pattern);
             } else {
@@ -34,7 +33,7 @@ public class RegexUtil {
         Pattern compile = pattern.get();
         if (compile == null) {
             compile = Pattern.compile(patternStr, flags);
-            pattern = new WeakReference<>(compile);
+            pattern = new SoftReference<>(compile);
             if (patternMap.size() < MAX_PATTERN_CACHE_NUM) {
                 patternMap.put(key, pattern);
             } else {

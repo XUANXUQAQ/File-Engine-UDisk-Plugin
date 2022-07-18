@@ -1,11 +1,9 @@
 package UDisk;
 
 import UDisk.DllInterface.IsLocalDisk;
-import UDisk.SqliteConfig.SQLiteUtil;
-import UDisk.VersionCheck.VersionCheckUtil;
+import UDisk.utils.SQLiteUtil;
+import UDisk.utils.VersionCheckUtil;
 import UDisk.utils.*;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,9 +12,9 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.ResultSet;
@@ -34,12 +32,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static UDisk.Search.SearchUDisk.searchFiles;
+import static UDisk.utils.SearchUtil.searchFiles;
 import static UDisk.utils.OpenFileUtil.openWithAdmin;
 import static UDisk.utils.OpenFileUtil.openWithoutAdmin;
 
 public class PluginMain extends Plugin {
-    private final String databaseRelativePath = "plugins/Plugin configuration files/UDisk/data.db";
+    private static final String databaseRelativePath = "plugins/Plugin configuration files/UDisk/data.db";
     private final String[] arr = new String[]{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
     private boolean isNotExit = true;
     private long startTime;
@@ -68,39 +66,6 @@ public class PluginMain extends Plugin {
             Class.forName("UDisk.DllInterface.IsLocalDisk");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
-        }
-    }
-
-
-    private void initAllSettings() {
-        String line;
-        StringBuilder strb = new StringBuilder();
-        String settingsRelativePath = "user/settings.json";
-        File settings = new File(settingsRelativePath);
-        try (BufferedReader buffr = new BufferedReader(new InputStreamReader(new FileInputStream(settings), StandardCharsets.UTF_8))) {
-            while ((line = buffr.readLine()) != null) {
-                strb.append(line);
-            }
-            JSONObject settingsInJson = JSON.parseObject(strb.toString());
-            if (settingsInJson.containsKey("openLastFolderKeyCode")) {
-                openLastFolderKeyCode = settingsInJson.getInteger("openLastFolderKeyCode");
-            } else {
-                openLastFolderKeyCode = 17;
-            }
-            if (settingsInJson.containsKey("runAsAdminKeyCode")) {
-                runAsAdminKeyCode = settingsInJson.getInteger("runAsAdminKeyCode");
-            } else {
-                runAsAdminKeyCode = 16;
-            }
-            if (settingsInJson.containsKey("copyPathKeyCode")) {
-                copyPathKeyCode = settingsInJson.getInteger("copyPathKeyCode");
-            } else {
-                copyPathKeyCode = 18;
-            }
-        } catch (NullPointerException | IOException e) {
-            openLastFolderKeyCode = 17;
-            runAsAdminKeyCode = 16;
-            copyPathKeyCode = 18;
         }
     }
 
@@ -233,7 +198,7 @@ public class PluginMain extends Plugin {
                                             if (IsLocalDisk.INSTANCE.isDiskNTFS(file.getAbsolutePath())) {
                                                 displayMessage("提示", "该磁盘为NTFS格式，可以添加进入主程序进行搜索，速度相较于插件更快");
                                             } else {
-                                                searchFiles(searchPath, databaseRelativePath);
+                                                searchFiles(searchPath);
                                                 displayMessage("提示", "搜索完成");
                                             }
                                         }
@@ -351,7 +316,7 @@ public class PluginMain extends Plugin {
             } else {
                 String[] strings;
                 int length;
-                strings = RegexUtil.colon.split(_text);
+                strings = RegexUtil.getPattern(":", 0).split(_text);
                 length = strings.length;
                 if (length == 2) {
                     searchCase = RegexUtil.semicolon.split(strings[1].toLowerCase());
@@ -382,10 +347,11 @@ public class PluginMain extends Plugin {
             if (!pluginFolder.exists()) {
                 pluginFolder.mkdirs();
             }
-            int colorHex = (int) configs.get("fontColorWithCoverage");
+            final int colorHex = (int) configs.getOrDefault("fontColorWithCoverage", 0);
             pluginFontColorWithCoverage = new Color(colorHex);
-            initAllSettings();
-
+            openLastFolderKeyCode = (int) configs.getOrDefault("openLastFolderKeyCode", 17);
+            runAsAdminKeyCode = (int) configs.getOrDefault("runAsAdminKeyCode", 16);
+            copyPathKeyCode = (int) configs.getOrDefault("copyPathKeyCode", 18);
             Path databaseFilePath = Path.of(databaseRelativePath);
             if (Files.exists(databaseFilePath)) {
                 long length = Files.size(databaseFilePath);
@@ -576,7 +542,7 @@ public class PluginMain extends Plugin {
         chinesePinyinMap.entrySet()
                 .stream()
                 .filter(pair -> Arrays.stream(keywords)
-                        .anyMatch(each -> each.toLowerCase(Locale.ROOT).indexOf(pair.getValue().toLowerCase(Locale.ROOT)) != -1))
+                        .anyMatch(each -> each.toLowerCase(Locale.ROOT).contains(pair.getValue().toLowerCase(Locale.ROOT))))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
                 .forEach((k, v) -> builder.append(k).append("|"));
         if (builder.length() > 0) {
@@ -666,7 +632,8 @@ public class PluginMain extends Plugin {
             subNum = Math.min(result.length(), subNum);
             String showPath = isContract ? result.substring(0, subNum) : result;
             String add = isContract ? "..." : "";
-            label.setName("<html><body>" + highLight(FileUtil.getFileName(result), keywords) + getBlank(20) + "<font size=\"-2\">" + showPath + add + "</font></body></html>");
+            label.setName("<html><body>" + highLight(FileUtil.getFileName(result), keywords) + getBlank(20) +
+                    "<font size=\"-2\">" + showPath + add + "</font></body></html>");
         }
         label.setText(allHtml);
         ImageIcon icon = GetIconUtil.getBigIcon(result, pluginIconSideLength, pluginIconSideLength);

@@ -1,4 +1,4 @@
-package UDisk.VersionCheck;
+package UDisk.utils;
 
 import com.alibaba.fastjson.JSONObject;
 
