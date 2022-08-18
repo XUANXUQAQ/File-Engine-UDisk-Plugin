@@ -1,5 +1,5 @@
 {
-  "className" : "UDisk.PluginMain",
+  "className" : "file.engine.udisk.PluginMain",
   "identifier" : "udisk",
   "name" : "UDisk"
 }

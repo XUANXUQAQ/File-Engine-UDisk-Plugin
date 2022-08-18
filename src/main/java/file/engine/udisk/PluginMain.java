@@ -1,9 +1,7 @@
-package UDisk;
+package file.engine.udisk;
 
-import UDisk.DllInterface.IsLocalDisk;
-import UDisk.utils.SQLiteUtil;
-import UDisk.utils.VersionCheckUtil;
-import UDisk.utils.*;
+import file.engine.udisk.DllInterface.IsLocalDisk;
+import file.engine.udisk.utils.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -32,9 +30,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static UDisk.utils.SearchUtil.searchFiles;
-import static UDisk.utils.OpenFileUtil.openWithAdmin;
-import static UDisk.utils.OpenFileUtil.openWithoutAdmin;
+import static file.engine.udisk.utils.SearchUtil.searchFiles;
 
 public class PluginMain extends Plugin {
     private static final String databaseRelativePath = "plugins/Plugin configuration files/UDisk/data.db";
@@ -63,7 +59,7 @@ public class PluginMain extends Plugin {
 
     private void initDll() {
         try {
-            Class.forName("UDisk.DllInterface.IsLocalDisk");
+            Class.forName("file.engine.udisk.DllInterface.IsLocalDisk");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -440,13 +436,13 @@ public class PluginMain extends Plugin {
                 e1.printStackTrace();
             }
         } else if (isRunAsAdminPressed) {
-            openWithAdmin(result);
+            OpenFileUtil.openWithAdmin(result);
         } else if (isCopyPathPressed) {
             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
             Transferable trans = new StringSelection(result);
             clipboard.setContents(trans, null);
         } else {
-            openWithoutAdmin(result);
+            OpenFileUtil.openWithoutAdmin(result);
         }
     }
 

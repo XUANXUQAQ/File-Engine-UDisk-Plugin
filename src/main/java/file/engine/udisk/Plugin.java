@@ -1,4 +1,4 @@
-package UDisk;
+package file.engine.udisk;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;

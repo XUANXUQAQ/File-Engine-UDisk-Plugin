@@ -1,4 +1,4 @@
-package UDisk.DllInterface;
+package file.engine.udisk.DllInterface;
 
 import com.sun.jna.Library;
 import com.sun.jna.Native;
