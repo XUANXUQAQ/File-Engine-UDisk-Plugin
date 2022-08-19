@@ -469,7 +469,7 @@ public class PluginMain extends Plugin {
     @Override
     public String getDescription() {
         return "icon: https://icons8.com/icon/VUbZIzgZCtQe/u " +
-                "icon by https://icons8.com Icons8</a>\n" +
+                "icon by https://icons8.com Icons8\n" +
                 "中文说明：\n" +
                 "1.将U盘插入计算机时，\n" +
                 "\t您会看到这样的提示\n" +
