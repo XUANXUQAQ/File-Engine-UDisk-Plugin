@@ -468,46 +468,44 @@ public class PluginMain extends Plugin {
 
     @Override
     public String getDescription() {
-        String template = "<html><body>%s</body></html>";
-        return String.format(template,
-                "<a target=\"_blank\" href=\"https://icons8.com/icon/VUbZIzgZCtQe/u\">U</a> " +
-                        "icon by <a target=\"_blank\" href=\"https://icons8.com\">Icons8</a>\n" +
-                        "中文说明：\n" +
-                        "1.将U盘插入计算机时，\n" +
-                        "\t您会看到这样的提示\n" +
-                        "\t---->键入“> udisk>驱动器号”来索引U盘\n" +
-                        "\t只需按照提示输入，您将收到另一个提示\n" +
-                        "\t---->搜索完成。\n" +
-                        "\n" +
-                        "2.搜索完成后。您可以输入“> udisk test”来搜索名称包含“ test”的文件。\n" +
-                        "\t示例1：“>“ udisk测试” --->包含“ test”（“ TEST”“ Test”“ TEst” ...）的文件或目录。\n" +
-                        "\t示例2：“> udisk test1; test2” --->包含“ test1（TEST1）”和“ test2（TEST2）”的文件或目录\n" +
-                        "\t您也可以使用一些过滤器，例如“：f（file）”“：d（directory）”“：full”“：case”。不同的过滤器应以分号分隔。\n" +
-                        "\t示例1：“> udisk test：f” ---->仅包含“ test”（“ TEST”“ Test”“ TEst” ...）的文件。\n" +
-                        "\t示例2：“> udisk test：d” ---->仅包含“ test”（“ TEST”“ Test”“ TEst” ...）的目录。\n" +
-                        "\t示例3：“> udisk test：full” --->名称为“ test”（“ TEST”“ Test”“ TEst” ...）的文件或目录。\n" +
-                        "\t示例4：“> udisk test：case” --->包含“ test”的文件或目录。\n" +
-                        "\t示例5：“> udisk test：f; full” --->仅名称为“ test”（“ TEST”“ Test”“ TEst” ...）的文件。\n" +
-                        "\t示例6：“> udisk test：d; case; full” --->仅名称为“ test”的目录。\n" +
-                        "\n" +
-                        "English Instuction:\n" +
-                        "\n" +
-                        "1. When you plug the U disk into the computer,\n" +
-                        "\tYou will see a tip like this\n" +
-                        "\t----> Type \">udisk> drive letter\" to index the U disk\n" +
-                        "\tJust input what the tip says, and you will receive another tip like this\n" +
-                        "\t----> Search Done.\n" +
-                        "\n" +
-                        "2. When the search has done. You can input \">udisk test\" to search files whose name includeing \"test\".\n" +
-                        "\tExample 1 : \">udisk test\" ---> files or dirs that including \"test\"(\"TEST\" \"Test\" \"TEst\"...).\n" +
-                        "\tExample 2 : \">udisk test1;test2\" ---> files or dirs that including \"test1(TEST1)\" AND \"test2(TEST2)\"\n" +
-                        "\tYou can also use some filters like \":f(file)\" \":d(directory)\" \":full\" \":case\".Different filters should be separated by semicolons.\n" +
-                        "\tExample 1 : \">udisk test:f\" ----> Only files that including \"test\"(\"TEST\" \"Test\" \"TEst\"...).\n" +
-                        "\tExample 2 : \">udisk test:d\" ----> Only directories that including \"test\"(\"TEST\" \"Test\" \"TEst\"...).\n" +
-                        "\tExample 3 : \">udisk test:full\" ---> files or dirs whose name is \"test\"(\"TEST\" \"Test\" \"TEst\"...).\n" +
-                        "\tExample 4 : \">udisk test:case\" ---> files or dirs that including \"test\".\n" +
-                        "\tExample 5 : \">udisk test:f;full\" ---> Only files whose name is \"test\"(\"TEST\" \"Test\" \"TEst\"...).\n" +
-                        "\tExample 6 : \">udisk test:d;case;full\" ---> Only dirs whose name is \"test\".");
+        return "icon: https://icons8.com/icon/VUbZIzgZCtQe/u " +
+                "icon by https://icons8.com Icons8</a>\n" +
+                "中文说明：\n" +
+                "1.将U盘插入计算机时，\n" +
+                "\t您会看到这样的提示\n" +
+                "\t---->键入“> udisk>驱动器号”来索引U盘\n" +
+                "\t只需按照提示输入，您将收到另一个提示\n" +
+                "\t---->搜索完成。\n" +
+                "\n" +
+                "2.搜索完成后。您可以输入“> udisk test”来搜索名称包含“ test”的文件。\n" +
+                "\t示例1：“>“ udisk测试” --->包含“ test”（“ TEST”“ Test”“ TEst” ...）的文件或目录。\n" +
+                "\t示例2：“> udisk test1; test2” --->包含“ test1（TEST1）”和“ test2（TEST2）”的文件或目录\n" +
+                "\t您也可以使用一些过滤器，例如“：f（file）”“：d（directory）”“：full”“：case”。不同的过滤器应以分号分隔。\n" +
+                "\t示例1：“> udisk test：f” ---->仅包含“ test”（“ TEST”“ Test”“ TEst” ...）的文件。\n" +
+                "\t示例2：“> udisk test：d” ---->仅包含“ test”（“ TEST”“ Test”“ TEst” ...）的目录。\n" +
+                "\t示例3：“> udisk test：full” --->名称为“ test”（“ TEST”“ Test”“ TEst” ...）的文件或目录。\n" +
+                "\t示例4：“> udisk test：case” --->包含“ test”的文件或目录。\n" +
+                "\t示例5：“> udisk test：f; full” --->仅名称为“ test”（“ TEST”“ Test”“ TEst” ...）的文件。\n" +
+                "\t示例6：“> udisk test：d; case; full” --->仅名称为“ test”的目录。\n" +
+                "\n" +
+                "English Instuction:\n" +
+                "\n" +
+                "1. When you plug the U disk into the computer,\n" +
+                "\tYou will see a tip like this\n" +
+                "\t----> Type \">udisk> drive letter\" to index the U disk\n" +
+                "\tJust input what the tip says, and you will receive another tip like this\n" +
+                "\t----> Search Done.\n" +
+                "\n" +
+                "2. When the search has done. You can input \">udisk test\" to search files whose name includeing \"test\".\n" +
+                "\tExample 1 : \">udisk test\" ---> files or dirs that including \"test\"(\"TEST\" \"Test\" \"TEst\"...).\n" +
+                "\tExample 2 : \">udisk test1;test2\" ---> files or dirs that including \"test1(TEST1)\" AND \"test2(TEST2)\"\n" +
+                "\tYou can also use some filters like \":f(file)\" \":d(directory)\" \":full\" \":case\".Different filters should be separated by semicolons.\n" +
+                "\tExample 1 : \">udisk test:f\" ----> Only files that including \"test\"(\"TEST\" \"Test\" \"TEst\"...).\n" +
+                "\tExample 2 : \">udisk test:d\" ----> Only directories that including \"test\"(\"TEST\" \"Test\" \"TEst\"...).\n" +
+                "\tExample 3 : \">udisk test:full\" ---> files or dirs whose name is \"test\"(\"TEST\" \"Test\" \"TEst\"...).\n" +
+                "\tExample 4 : \">udisk test:case\" ---> files or dirs that including \"test\".\n" +
+                "\tExample 5 : \">udisk test:f;full\" ---> Only files whose name is \"test\"(\"TEST\" \"Test\" \"TEst\"...).\n" +
+                "\tExample 6 : \">udisk test:d;case;full\" ---> Only dirs whose name is \"test\".";
     }
 
     @Override
