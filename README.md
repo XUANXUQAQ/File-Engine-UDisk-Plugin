@@ -2,6 +2,9 @@
 ## How to use
 Download the plugin, and put it into the plugins folder.
 
+<a target="_blank" href="https://icons8.com/icon/VUbZIzgZCtQe/u">U</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
+
+
 ### NOTICE : Only File-Engine V2.1 and above support plugins.
 ***
 ### usage:
