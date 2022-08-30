@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -82,8 +83,8 @@ public class PluginMain extends Plugin {
         //为label添加结果
         String each;
         String pSql = "SELECT PATH FROM " + column + ";";
-        try (Statement pStmt = SQLiteUtil.getConnection().createStatement();
-             ResultSet resultSet = pStmt.executeQuery(pSql)) {
+        try (Connection conn = SQLiteUtil.getConnection(); Statement stmt = conn.createStatement();
+             ResultSet resultSet = stmt.executeQuery(pSql)) {
             while (resultSet.next()) {
                 each = resultSet.getString("PATH");
                 checkIsMatchedAndAddToList(each);
