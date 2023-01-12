@@ -296,9 +296,10 @@ public class PluginMain extends Plugin {
     public void eventProcessed(Class<?> c, Object eventInstance) {
         if ("file.engine.event.handler.impl.database.PrepareSearchEvent".equals(c.getName())) {
             try {
-                Field searchTextField = c.getDeclaredField("searchText");
-                Field searchCaseField = c.getDeclaredField("searchCase");
-                Field keywordsField = c.getDeclaredField("keywords");
+                Class<?> superclass = c.getSuperclass();
+                Field searchTextField = superclass.getDeclaredField("searchText");
+                Field searchCaseField = superclass.getDeclaredField("searchCase");
+                Field keywordsField = superclass.getDeclaredField("keywords");
                 Supplier<String> searchTextSupplier = (Supplier<String>) searchTextField.get(eventInstance);
                 Supplier<String[]> searchCaseSupplier = (Supplier<String[]>) searchCaseField.get(eventInstance);
                 Supplier<String[]> keywordsSupplier = (Supplier<String[]>) keywordsField.get(eventInstance);
