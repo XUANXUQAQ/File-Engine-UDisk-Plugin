@@ -1,6 +1,6 @@
 package file.engine.udisk;
 
-import file.engine.udisk.DllInterface.IsLocalDisk;
+import file.engine.udisk.dllInterface.IsLocalDisk;
 import file.engine.udisk.utils.*;
 
 import javax.swing.*;
@@ -43,24 +43,24 @@ public class PluginMain extends Plugin {
     private volatile String searchText;
     private static volatile String[] keywords;
     private final ConcurrentLinkedQueue<String> commandQueue = new ConcurrentLinkedQueue<>();
-    private volatile boolean isRunAsAdminPressed = false;
-    private volatile boolean isCopyPathPressed = false;
-    private volatile boolean isIndexMode = false;
-    private volatile boolean isOpenLastFolderPressed = false;
+    private boolean isRunAsAdminPressed = false;
+    private boolean isCopyPathPressed = false;
+    private boolean isIndexMode = false;
+    private boolean isOpenLastFolderPressed = false;
     private int pluginIconSideLength = 0;
     private Color pluginLabelColor = new Color(0xcccccc);
     private Color pluginBackgroundColor = new Color(0x333333);
     private Color pluginFontColorWithCoverage = Color.BLACK;
-    private volatile String text;
-    private volatile int openLastFolderKeyCode;
-    private volatile int runAsAdminKeyCode;
-    private volatile int copyPathKeyCode;
+    private String text;
+    private int openLastFolderKeyCode;
+    private int runAsAdminKeyCode;
+    private int copyPathKeyCode;
     private boolean timer = false;
     private final HashMap<String, Boolean> mapDiskExist = new HashMap<>();
 
     private void initDll() {
         try {
-            Class.forName("file.engine.udisk.DllInterface.IsLocalDisk");
+            Class.forName("file.engine.udisk.dllInterface.IsLocalDisk");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -157,61 +157,61 @@ public class PluginMain extends Plugin {
         });
 
         threadPool.execute(() -> {
-            try {
-                String column;
-                while (isNotExit) {
-                    try {
-                        while ((column = commandQueue.poll()) != null) {
-                            addResult(System.currentTimeMillis(), column);
-                        }
-                    } catch (SQLException e) {
-                        e.printStackTrace();
+            String column;
+            while (isNotExit) {
+                try {
+                    while ((column = commandQueue.poll()) != null) {
+                        addResult(System.currentTimeMillis(), column);
                     }
-                    TimeUnit.MILLISECONDS.sleep(10);
+                } catch (SQLException e) {
+                    e.printStackTrace();
                 }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+                try {
+                    TimeUnit.MILLISECONDS.sleep(10);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 
         threadPool.execute(() -> { //添加sql命令线程
-            try {
-                long endTime;
-                while (isNotExit) {
-                    endTime = System.currentTimeMillis();
-                    if ((endTime - startTime > 500) && (timer) && !isIndexMode) {
-                        timer = false;
-                        addTables();
-                    } else if ((endTime - startTime > 500) && (timer) && isIndexMode) {
-                        timer = false;
-                        isIndexMode = false;
-                        try {
-                            if (text != null) {
-                                String searchPath = text.charAt(1) + ":";
-                                if (!":".equals(searchPath)) {
-                                    try {
-                                        File file = new File(searchPath + "\\");
-                                        if (file.exists()) {
-                                            if (IsLocalDisk.INSTANCE.isDiskNTFS(file.getAbsolutePath())) {
-                                                displayMessage("提示", "该磁盘为NTFS格式，可以添加进入主程序进行搜索，速度相较于插件更快");
-                                            } else {
-                                                searchFiles(searchPath);
-                                                displayMessage("提示", "搜索完成");
-                                            }
+            long endTime;
+            while (isNotExit) {
+                endTime = System.currentTimeMillis();
+                if ((endTime - startTime > 500) && (timer) && !isIndexMode) {
+                    timer = false;
+                    addTables();
+                } else if ((endTime - startTime > 500) && (timer) && isIndexMode) {
+                    timer = false;
+                    isIndexMode = false;
+                    try {
+                        if (text != null) {
+                            String searchPath = text.charAt(1) + ":";
+                            if (!":".equals(searchPath)) {
+                                try {
+                                    File file = new File(searchPath + "\\");
+                                    if (file.exists()) {
+                                        if (IsLocalDisk.INSTANCE.isDiskNTFS(file.getAbsolutePath())) {
+                                            displayMessage("提示", "该磁盘为NTFS格式，可以添加进入主程序进行搜索，速度相较于插件更快");
+                                        } else {
+                                            searchFiles(searchPath);
+                                            displayMessage("提示", "搜索完成");
                                         }
-                                    } catch (IOException | InterruptedException e) {
-                                        e.printStackTrace();
                                     }
+                                } catch (IOException | InterruptedException | SQLException e) {
+                                    e.printStackTrace();
                                 }
                             }
-                        } catch (StringIndexOutOfBoundsException e) {
-                            e.printStackTrace();
                         }
+                    } catch (StringIndexOutOfBoundsException e) {
+                        e.printStackTrace();
                     }
-                    TimeUnit.MILLISECONDS.sleep(50);
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
+                try {
+                    TimeUnit.MILLISECONDS.sleep(50);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
     }
@@ -324,7 +324,7 @@ public class PluginMain extends Plugin {
             } else {
                 String[] strings;
                 int length;
-                strings = RegexUtil.getPattern(":", 0).split(_text);
+                strings = RegexUtil.getPattern("\\|", 0).split(_text);
                 length = strings.length;
                 if (length == 2) {
                     searchCase = RegexUtil.semicolon.split(strings[1].toLowerCase());
