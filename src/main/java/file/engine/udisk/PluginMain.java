@@ -407,6 +407,7 @@ public class PluginMain extends Plugin {
         int key = e.getKeyCode();
         if (10 == key) {
             openFile(result);
+            sendEventToFileEngine("file.engine.event.handler.impl.frame.searchBar.HideSearchBarEvent");
         } else if (openLastFolderKeyCode == key) {
             //打开上级文件夹热键被点击
             isOpenLastFolderPressed = true;
@@ -426,6 +427,7 @@ public class PluginMain extends Plugin {
     @Override
     public void mousePressed(MouseEvent e, String result) {
         openFile(result);
+        sendEventToFileEngine("file.engine.event.handler.impl.frame.searchBar.HideSearchBarEvent");
     }
 
     private void openFile(String result) {
