@@ -294,7 +294,7 @@ public class PluginMain extends Plugin {
     @SuppressWarnings("unchecked")
     @Override
     public void eventProcessed(Class<?> c, Object eventInstance) {
-        if ("file.engine.event.handler.impl.database.StartSearchEvent".equals(c.getName())) {
+        if ("file.engine.event.handler.impl.database.PrepareSearchEvent".equals(c.getName())) {
             try {
                 Field searchTextField = c.getDeclaredField("searchText");
                 Field searchCaseField = c.getDeclaredField("searchCase");
