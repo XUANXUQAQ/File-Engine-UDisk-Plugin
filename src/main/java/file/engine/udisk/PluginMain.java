@@ -482,12 +482,12 @@ public class PluginMain extends Plugin {
                 "\t示例1：“>“ udisk测试” --->包含“ test”（“ TEST”“ Test”“ TEst” ...）的文件或目录。\n" +
                 "\t示例2：“> udisk test1; test2” --->包含“ test1（TEST1）”和“ test2（TEST2）”的文件或目录\n" +
                 "\t您也可以使用一些过滤器，例如“：f（file）”“：d（directory）”“：full”“：case”。不同的过滤器应以分号分隔。\n" +
-                "\t示例1：“> udisk test：f” ---->仅包含“ test”（“ TEST”“ Test”“ TEst” ...）的文件。\n" +
-                "\t示例2：“> udisk test：d” ---->仅包含“ test”（“ TEST”“ Test”“ TEst” ...）的目录。\n" +
-                "\t示例3：“> udisk test：full” --->名称为“ test”（“ TEST”“ Test”“ TEst” ...）的文件或目录。\n" +
-                "\t示例4：“> udisk test：case” --->包含“ test”的文件或目录。\n" +
-                "\t示例5：“> udisk test：f; full” --->仅名称为“ test”（“ TEST”“ Test”“ TEst” ...）的文件。\n" +
-                "\t示例6：“> udisk test：d; case; full” --->仅名称为“ test”的目录。\n" +
+                "\t示例1：“> udisk test|f” ---->仅包含“ test”（“ TEST”“ Test”“ TEst” ...）的文件。\n" +
+                "\t示例2：“> udisk test|d” ---->仅包含“ test”（“ TEST”“ Test”“ TEst” ...）的目录。\n" +
+                "\t示例3：“> udisk test|full” --->名称为“ test”（“ TEST”“ Test”“ TEst” ...）的文件或目录。\n" +
+                "\t示例4：“> udisk test|case” --->包含“ test”的文件或目录。\n" +
+                "\t示例5：“> udisk test|f;full” --->仅名称为“ test”（“ TEST”“ Test”“ TEst” ...）的文件。\n" +
+                "\t示例6：“> udisk test|d;case;full” --->仅名称为“ test”的目录。\n" +
                 "\n" +
                 "English Instuction:\n" +
                 "\n" +
@@ -501,12 +501,12 @@ public class PluginMain extends Plugin {
                 "\tExample 1 : \">udisk test\" ---> files or dirs that including \"test\"(\"TEST\" \"Test\" \"TEst\"...).\n" +
                 "\tExample 2 : \">udisk test1;test2\" ---> files or dirs that including \"test1(TEST1)\" AND \"test2(TEST2)\"\n" +
                 "\tYou can also use some filters like \":f(file)\" \":d(directory)\" \":full\" \":case\".Different filters should be separated by semicolons.\n" +
-                "\tExample 1 : \">udisk test:f\" ----> Only files that including \"test\"(\"TEST\" \"Test\" \"TEst\"...).\n" +
-                "\tExample 2 : \">udisk test:d\" ----> Only directories that including \"test\"(\"TEST\" \"Test\" \"TEst\"...).\n" +
-                "\tExample 3 : \">udisk test:full\" ---> files or dirs whose name is \"test\"(\"TEST\" \"Test\" \"TEst\"...).\n" +
-                "\tExample 4 : \">udisk test:case\" ---> files or dirs that including \"test\".\n" +
-                "\tExample 5 : \">udisk test:f;full\" ---> Only files whose name is \"test\"(\"TEST\" \"Test\" \"TEst\"...).\n" +
-                "\tExample 6 : \">udisk test:d;case;full\" ---> Only dirs whose name is \"test\".";
+                "\tExample 1 : \">udisk test|f\" ----> Only files that including \"test\"(\"TEST\" \"Test\" \"TEst\"...).\n" +
+                "\tExample 2 : \">udisk test|d\" ----> Only directories that including \"test\"(\"TEST\" \"Test\" \"TEst\"...).\n" +
+                "\tExample 3 : \">udisk test|full\" ---> files or dirs whose name is \"test\"(\"TEST\" \"Test\" \"TEst\"...).\n" +
+                "\tExample 4 : \">udisk test|case\" ---> files or dirs that including \"test\".\n" +
+                "\tExample 5 : \">udisk test|f;full\" ---> Only files whose name is \"test\"(\"TEST\" \"Test\" \"TEst\"...).\n" +
+                "\tExample 6 : \">udisk test|d;case;full\" ---> Only dirs whose name is \"test\".";
     }
 
     @Override
