@@ -76,25 +76,26 @@ public class PathMatchUtil {
         Path pathVar = Path.of(path);
         for (String eachCase : searchCase) {
             switch (eachCase) {
-                case "f":
+                case "f" -> {
                     if (!Files.isRegularFile(pathVar)) {
                         return false;
                     }
-                    break;
-                case "d":
+                }
+                case "d" -> {
                     if (!Files.isDirectory(pathVar)) {
                         return false;
                     }
-                    break;
-                case "full":
+                }
+                case "full" -> {
                     if (!searchText.equalsIgnoreCase(FileUtil.getFileName(path))) {
                         return false;
                     }
-                    break;
-                case "case":
+                }
+                case "case" -> {
                     if (notMatched(path, false, keywords)) {
                         return false;
                     }
+                }
             }
         }
         //所有规则均已匹配
