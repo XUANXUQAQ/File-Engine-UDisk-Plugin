@@ -10,7 +10,7 @@ import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 
 public class VersionCheckUtil {
-    private static final String CURRENT_VERSION = "2.4";
+    private static final String CURRENT_VERSION = "2.3";
     private static String updateURL;
 
     private static JSONObject getVersionInfo() throws IOException {
@@ -19,7 +19,7 @@ public class VersionCheckUtil {
         URLConnection uc = updateServer.openConnection();
         uc.setConnectTimeout(3000);
         //防止屏蔽程序抓取而返回403错误
-        uc.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.116 Safari/537.36 Edg/80.0.361.57");
+        uc.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36 Edg/109.0.1518.55");
         try (BufferedReader br = new BufferedReader(new InputStreamReader(uc.getInputStream(), StandardCharsets.UTF_8))) {
             String eachLine;
             while ((eachLine = br.readLine()) != null) {
