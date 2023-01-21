@@ -35,7 +35,10 @@ import static file.engine.udisk.utils.SearchUtil.searchFiles;
 
 public class PluginMain extends Plugin {
     private static final String databaseRelativePath = "plugins/Plugin configuration files/UDisk/data.db";
-    private final String[] arr = new String[]{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
+    private static final int START_SEARCH_TIMEOUT = 350; //毫秒
+    private final String[] arr = new String[]{
+            "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"
+    };
     private boolean isNotExit = true;
     private long startTime;
     private final ExecutorService threadPool = Executors.newCachedThreadPool();
@@ -66,25 +69,19 @@ public class PluginMain extends Plugin {
         }
     }
 
-    private boolean isExist(String path) {
-        File f = new File(path);
-        return f.exists();
-    }
-
     private void checkIsMatchedAndAddToList(String path) {
         if (PathMatchUtil.check(path, searchCase, searchText, keywords)) {
-            if (isExist(path)) {
+            if (FileUtil.isExist(path)) {
                 addToResultQueue(path);
             }
         }
     }
 
-    private void addResult(long time, String column) throws SQLException {
+    private void addResult(Statement stmt, long time, String column) throws SQLException {
         //为label添加结果
         String each;
         String pSql = "SELECT PATH FROM " + column + ";";
-        try (Connection conn = SQLiteUtil.getConnection(); Statement stmt = conn.createStatement();
-             ResultSet resultSet = stmt.executeQuery(pSql)) {
+        try (ResultSet resultSet = stmt.executeQuery(pSql)) {
             while (resultSet.next()) {
                 each = resultSet.getString("PATH");
                 checkIsMatchedAndAddToList(each);
@@ -142,6 +139,12 @@ public class PluginMain extends Plugin {
     }
 
     private void initThreadPool() {
+        displayMessageThread();
+        searchDatabaseThread();
+        indexUDiskThread();
+    }
+
+    private void displayMessageThread() {
         threadPool.execute(() -> {
             String[] disks;
             while (isNotExit) {
@@ -155,16 +158,20 @@ public class PluginMain extends Plugin {
                 }
             }
         });
+    }
 
+    private void searchDatabaseThread() {
         threadPool.execute(() -> {
             String column;
             while (isNotExit) {
-                try {
-                    while ((column = commandQueue.poll()) != null) {
-                        addResult(System.currentTimeMillis(), column);
+                if (!commandQueue.isEmpty()) {
+                    try (Connection conn = SQLiteUtil.getConnection(); Statement stmt = conn.createStatement()) {
+                        while ((column = commandQueue.poll()) != null) {
+                            addResult(stmt, System.currentTimeMillis(), column);
+                        }
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
                     }
-                } catch (SQLException e) {
-                    e.printStackTrace();
                 }
                 try {
                     TimeUnit.MILLISECONDS.sleep(10);
@@ -173,15 +180,16 @@ public class PluginMain extends Plugin {
                 }
             }
         });
+    }
 
-        threadPool.execute(() -> { //添加sql命令线程
-            long endTime;
+    private void indexUDiskThread() {
+        threadPool.execute(() -> {
             while (isNotExit) {
-                endTime = System.currentTimeMillis();
-                if ((endTime - startTime > 500) && (timer) && !isIndexMode) {
+                var endTime = System.currentTimeMillis();
+                if ((endTime - startTime > START_SEARCH_TIMEOUT) && (timer) && !isIndexMode) {
                     timer = false;
                     addTables();
-                } else if ((endTime - startTime > 500) && (timer) && isIndexMode) {
+                } else if ((endTime - startTime > START_SEARCH_TIMEOUT) && (timer) && isIndexMode) {
                     timer = false;
                     isIndexMode = false;
                     try {
@@ -194,6 +202,7 @@ public class PluginMain extends Plugin {
                                         if (IsLocalDisk.INSTANCE.isDiskNTFS(file.getAbsolutePath())) {
                                             displayMessage("提示", "该磁盘为NTFS格式，可以添加进入主程序进行搜索，速度相较于插件更快");
                                         } else {
+                                            displayMessage("提示", "正在搜索中");
                                             searchFiles(searchPath);
                                             displayMessage("提示", "搜索完成");
                                         }
@@ -341,11 +350,6 @@ public class PluginMain extends Plugin {
             timer = true;
             startTime = System.currentTimeMillis();
         }
-    }
-
-    @Override
-    public void loadPlugin() {
-
     }
 
     @Override

@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayDeque;
+import java.util.List;
 
 public class SearchUtil {
     public static void searchFiles(String path) throws IOException, InterruptedException, SQLException {
@@ -23,30 +25,47 @@ public class SearchUtil {
         }
     }
 
-    private static void queryDir(File file, Statement stmt) throws SQLException {
-        if (!file.exists()) {
+    private static void queryDir(File path, Statement stmt) throws SQLException {
+        File[] files = path.listFiles();
+        if (null == files || files.length == 0) {
             return;
         }
-        File[] content = file.listFiles();//取得当前目录下所有文件和文件夹
-        if (content == null) {
-            return;
+        List<File> filesList = List.of(files);
+        ArrayDeque<File> dirsToSearch = new ArrayDeque<>(filesList);
+        ArrayDeque<File> listRemainDir = new ArrayDeque<>(filesList);
+        do {
+            File remain = listRemainDir.poll();
+            if (remain == null) {
+                continue;
+            }
+            if (remain.isDirectory()) {
+                File[] subFiles = remain.listFiles();
+                if (subFiles != null) {
+                    List<File> subFilesList = List.of(subFiles);
+                    listRemainDir.addAll(subFilesList);
+                    dirsToSearch.addAll(subFilesList);
+                }
+            } else {
+                saveToDb(stmt, remain);
+            }
+        } while (!listRemainDir.isEmpty());
+        for (File eachDir : dirsToSearch) {
+            saveToDb(stmt, eachDir);
         }
-        for (File temp : content) {
-            if (temp.isDirectory()) {//判断是否是目录
-                queryDir(temp, stmt);//递归调用，删除目录里的内容
-            }
-            String name = temp.getName();
-            int ascii = 0;
-            for (int i = 0; i < name.length(); i++) {
-                ascii += name.charAt(i);
-            }
-            int asciiGroup = ascii / 100;
-            if (asciiGroup > 40) {
-                asciiGroup = 40;
-            }
-            String sql = "INSERT OR IGNORE INTO list%d VALUES (%d, \"%s\");";
-            sql = String.format(sql, asciiGroup, ascii, temp.getAbsolutePath());
-            stmt.executeUpdate(sql);
+    }
+
+    private static void saveToDb(Statement stmt, File eachDir) throws SQLException {
+        String name = eachDir.getName();
+        int ascii = 0;
+        for (int i = 0; i < name.length(); i++) {
+            ascii += name.charAt(i);
         }
+        int asciiGroup = ascii / 100;
+        if (asciiGroup > 40) {
+            asciiGroup = 40;
+        }
+        String sql = "INSERT OR IGNORE INTO list%d VALUES (%d, \"%s\");";
+        sql = String.format(sql, asciiGroup, ascii, eachDir.getAbsolutePath());
+        stmt.executeUpdate(sql);
     }
 }

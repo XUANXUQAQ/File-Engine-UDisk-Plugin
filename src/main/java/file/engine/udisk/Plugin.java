@@ -68,8 +68,6 @@ public abstract class Plugin {
     //Interface
     public abstract void textChanged(String text);
 
-    public abstract void loadPlugin();
-
     public abstract void loadPlugin(Map<String, Object> configs);
 
     public abstract void unloadPlugin();
