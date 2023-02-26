@@ -31,7 +31,6 @@ public class SearchUtil {
             return;
         }
         List<File> filesList = List.of(files);
-        ArrayDeque<File> dirsToSearch = new ArrayDeque<>(filesList);
         ArrayDeque<File> listRemainDir = new ArrayDeque<>(filesList);
         do {
             File remain = listRemainDir.poll();
@@ -39,19 +38,16 @@ public class SearchUtil {
                 continue;
             }
             if (remain.isDirectory()) {
+                saveToDb(stmt, remain);
                 File[] subFiles = remain.listFiles();
                 if (subFiles != null) {
                     List<File> subFilesList = List.of(subFiles);
                     listRemainDir.addAll(subFilesList);
-                    dirsToSearch.addAll(subFilesList);
                 }
             } else {
                 saveToDb(stmt, remain);
             }
         } while (!listRemainDir.isEmpty());
-        for (File eachDir : dirsToSearch) {
-            saveToDb(stmt, eachDir);
-        }
     }
 
     private static void saveToDb(Statement stmt, File eachDir) throws SQLException {
